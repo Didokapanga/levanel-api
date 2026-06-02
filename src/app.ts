@@ -1,6 +1,11 @@
 import express from 'express';
 import cors from 'cors';
 
+import {
+  swaggerUi,
+  swaggerSpec,
+} from './config/swagger';
+
 import userRoutes from './routes/user.routes';
 import authRoutes from './routes/auth.routes';
 import clientRoutes from './routes/client.routes';
@@ -32,6 +37,12 @@ app.get('/', (_, res) => {
     message: 'Docker Hot Reload Working',
   });
 });
+
+app.use(
+  '/api-docs',
+  swaggerUi.serve,
+  swaggerUi.setup(swaggerSpec)
+);
 
 app.use('/api/users', userRoutes);
 app.use('/api/auth', authRoutes);
