@@ -31,6 +31,9 @@ Thumbs.db
 docker-data/
 postgres-data/
 *.tar
+docker-compose.override.yml
+Desktop.ini
+desktop.ini
 
 # TypeScript
 *.tsbuildinfo
