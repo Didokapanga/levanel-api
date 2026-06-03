@@ -1,0 +1,5012 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Levannel API",
+    "version": "1.0.0",
+    "description": "API REST de gestion d’agence de voyage développée avec Node.js, Express, TypeScript et PostgreSQL."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:5000",
+      "description": "Development Server"
+    },
+    {
+      "url": "https://levanel-api.onrender.com",
+      "description": "Production Server"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "paths": {
+    "/api/users": {
+      "post": {
+        "summary": "Créer un utilisateur",
+        "description": "Création d'un nouvel utilisateur.",
+        "tags": [
+          "Users"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "username",
+                  "full_name",
+                  "email",
+                  "password",
+                  "role"
+                ],
+                "properties": {
+                  "username": {
+                    "type": "string",
+                    "example": "john"
+                  },
+                  "full_name": {
+                    "type": "string",
+                    "example": "John Doe"
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "example": "john@test.com"
+                  },
+                  "password": {
+                    "type": "string",
+                    "example": 123456
+                  },
+                  "role": {
+                    "type": "string",
+                    "example": "admin"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Utilisateur créé avec succès"
+          },
+          "400": {
+            "description": "Données invalides"
+          },
+          "401": {
+            "description": "Non authentifié"
+          },
+          "403": {
+            "description": "Accès refusé"
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      },
+      "get": {
+        "summary": "Liste des utilisateurs",
+        "description": "Retourne tous les utilisateurs enregistrés.",
+        "tags": [
+          "Users"
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste récupérée avec succès",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Users retrieved successfully"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "username": {
+                            "type": "string",
+                            "example": "dido"
+                          },
+                          "full_name": {
+                            "type": "string",
+                            "example": "Dido Kapanga"
+                          },
+                          "email": {
+                            "type": "string",
+                            "example": "kapangadido@gmail.com"
+                          },
+                          "role": {
+                            "type": "string",
+                            "example": "admin"
+                          },
+                          "is_active": {
+                            "type": "boolean",
+                            "example": true
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Non authentifié"
+          },
+          "403": {
+            "description": "Accès refusé"
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      }
+    },
+    "/api/users/{id}": {
+      "put": {
+        "summary": "Modifier un utilisateur",
+        "description": "Met à jour les informations d'un utilisateur.",
+        "tags": [
+          "Users"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Identifiant utilisateur"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string",
+                    "example": "john"
+                  },
+                  "full_name": {
+                    "type": "string",
+                    "example": "John Doe"
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "example": "john@test.com"
+                  },
+                  "password": {
+                    "type": "string",
+                    "example": "NewPassword123"
+                  },
+                  "role": {
+                    "type": "string",
+                    "example": "manager"
+                  },
+                  "is_active": {
+                    "type": "boolean",
+                    "example": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Utilisateur modifié avec succès"
+          },
+          "400": {
+            "description": "Données invalides"
+          },
+          "401": {
+            "description": "Non authentifié"
+          },
+          "403": {
+            "description": "Accès refusé"
+          },
+          "404": {
+            "description": "Utilisateur introuvable"
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Supprimer un utilisateur",
+        "description": "Supprime un utilisateur existant.",
+        "tags": [
+          "Users"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Identifiant utilisateur"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Utilisateur supprimé avec succès"
+          },
+          "401": {
+            "description": "Non authentifié"
+          },
+          "403": {
+            "description": "Accès refusé"
+          },
+          "404": {
+            "description": "Utilisateur introuvable"
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      }
+    },
+    "/api/ticket-adjustments": {
+      "post": {
+        "summary": "Créer un ajustement de billet",
+        "description": "Crée un ajustement lié à un billet existant (modification, remboursement ou autre ajustement).",
+        "tags": [
+          "Ticket Adjustments"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "item_id",
+                  "adjustment_type"
+                ],
+                "properties": {
+                  "item_id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "example": "UUID"
+                  },
+                  "adjustment_type": {
+                    "type": "string",
+                    "example": "modification"
+                  },
+                  "airline_fee": {
+                    "type": "number",
+                    "example": 100
+                  },
+                  "agency_fee": {
+                    "type": "number",
+                    "example": 30
+                  },
+                  "refund_amount": {
+                    "type": "number",
+                    "example": 0
+                  },
+                  "new_debit_balance": {
+                    "type": "number",
+                    "example": 900
+                  },
+                  "notes": {
+                    "type": "string",
+                    "example": "Modification date de voyage"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Ajustement créé avec succès"
+          },
+          "400": {
+            "description": "Données invalides"
+          },
+          "401": {
+            "description": "Non authentifié"
+          },
+          "403": {
+            "description": "Accès réservé aux administrateurs, managers et agents"
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      },
+      "get": {
+        "summary": "Liste des ajustements",
+        "description": "Retourne la liste paginée des ajustements de billets.",
+        "tags": [
+          "Ticket Adjustments"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "example": 1
+            },
+            "description": "Numéro de page"
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "example": 10
+            },
+            "description": "Nombre d'éléments par page"
+          },
+          {
+            "in": "query",
+            "name": "adjustment_type",
+            "schema": {
+              "type": "string",
+              "example": "modification"
+            },
+            "description": "Filtrer par type d'ajustement"
+          },
+          {
+            "in": "query",
+            "name": "search",
+            "schema": {
+              "type": "string",
+              "example": "ET1234567890"
+            },
+            "description": "Recherche par numéro de billet, client, PNR ou référence d'ajustement"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste récupérée avec succès",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Adjustments retrieved successfully"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string",
+                                "format": "uuid"
+                              },
+                              "item_id": {
+                                "type": "string",
+                                "format": "uuid"
+                              },
+                              "adjustment_reference": {
+                                "type": "string",
+                                "example": "ADJ-20260521-001"
+                              },
+                              "adjustment_type": {
+                                "type": "string",
+                                "example": "modification"
+                              },
+                              "ticket_number": {
+                                "type": "string",
+                                "example": "ET1234567890"
+                              },
+                              "customer_name": {
+                                "type": "string",
+                                "example": "John Doe"
+                              },
+                              "pnr": {
+                                "type": "string",
+                                "example": "ABC123"
+                              },
+                              "airline_fee": {
+                                "type": "number",
+                                "example": 100
+                              },
+                              "agency_fee": {
+                                "type": "number",
+                                "example": 30
+                              },
+                              "refund_amount": {
+                                "type": "number",
+                                "example": 0
+                              },
+                              "new_debit_balance": {
+                                "type": "number",
+                                "example": 900
+                              },
+                              "notes": {
+                                "type": "string",
+                                "example": "Modification date de voyage"
+                              },
+                              "created_at": {
+                                "type": "string",
+                                "format": "date-time"
+                              }
+                            }
+                          }
+                        },
+                        "total": {
+                          "type": "integer",
+                          "example": 0
+                        },
+                        "page": {
+                          "type": "integer",
+                          "example": 1
+                        },
+                        "limit": {
+                          "type": "integer",
+                          "example": 10
+                        },
+                        "total_pages": {
+                          "type": "integer",
+                          "example": 0
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Non authentifié"
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      }
+    },
+    "/api/ticket-adjustments/{id}": {
+      "put": {
+        "summary": "Modifier un ajustement",
+        "description": "Met à jour les frais et informations d'un ajustement existant.",
+        "tags": [
+          "Ticket Adjustments"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Identifiant de l'ajustement"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "airline_fee": {
+                    "type": "number",
+                    "example": 150
+                  },
+                  "agency_fee": {
+                    "type": "number",
+                    "example": 50
+                  },
+                  "refund_amount": {
+                    "type": "number",
+                    "example": 0
+                  },
+                  "new_debit_balance": {
+                    "type": "number",
+                    "example": 850
+                  },
+                  "notes": {
+                    "type": "string",
+                    "example": "Ajustement après modification du billet"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ajustement modifié avec succès"
+          },
+          "400": {
+            "description": "Données invalides"
+          },
+          "401": {
+            "description": "Non authentifié"
+          },
+          "403": {
+            "description": "Accès réservé aux administrateurs et managers"
+          },
+          "404": {
+            "description": "Ajustement introuvable"
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Supprimer un ajustement",
+        "description": "Effectue une suppression logique d'un ajustement.",
+        "tags": [
+          "Ticket Adjustments"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Identifiant de l'ajustement"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ajustement supprimé avec succès"
+          },
+          "401": {
+            "description": "Non authentifié"
+          },
+          "403": {
+            "description": "Accès réservé aux administrateurs"
+          },
+          "404": {
+            "description": "Ajustement introuvable"
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      }
+    },
+    "/api/systems": {
+      "post": {
+        "summary": "Créer un système",
+        "description": "Crée un nouveau système de réservation ou plateforme partenaire.",
+        "tags": [
+          "Systems"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "name",
+                  "initial"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "Amadeus"
+                  },
+                  "initial": {
+                    "type": "string",
+                    "example": "AMA",
+                    "description": "Code unique du système"
+                  },
+                  "description": {
+                    "type": "string",
+                    "example": "Global Distribution System"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Système créé avec succès"
+          },
+          "400": {
+            "description": "Initial déjà existant ou données invalides"
+          },
+          "401": {
+            "description": "Non authentifié"
+          },
+          "403": {
+            "description": "Accès réservé aux administrateurs, managers et agents"
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      },
+      "get": {
+        "summary": "Liste des systèmes",
+        "description": "Retourne tous les systèmes enregistrés.",
+        "tags": [
+          "Systems"
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste récupérée avec succès",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Systems retrieved successfully"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "name": {
+                            "type": "string",
+                            "example": "Amadeus"
+                          },
+                          "initial": {
+                            "type": "string",
+                            "example": "AMA"
+                          },
+                          "description": {
+                            "type": "string",
+                            "example": "Global Distribution System"
+                          },
+                          "is_active": {
+                            "type": "boolean",
+                            "example": true
+                          },
+                          "created_at": {
+                            "type": "string",
+                            "format": "date-time",
+                            "example": "2026-05-20T13:04:58.623Z"
+                          },
+                          "updated_at": {
+                            "type": "string",
+                            "format": "date-time",
+                            "example": "2026-05-20T13:04:58.623Z"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Non authentifié"
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      }
+    },
+    "/api/systems/{id}": {
+      "put": {
+        "summary": "Modifier un système",
+        "description": "Met à jour les informations d'un système.",
+        "tags": [
+          "Systems"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Identifiant du système"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "Amadeus"
+                  },
+                  "initial": {
+                    "type": "string",
+                    "example": "AMA"
+                  },
+                  "description": {
+                    "type": "string",
+                    "example": "Global Distribution System"
+                  },
+                  "is_active": {
+                    "type": "boolean",
+                    "example": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Système modifié avec succès"
+          },
+          "400": {
+            "description": "Données invalides"
+          },
+          "401": {
+            "description": "Non authentifié"
+          },
+          "403": {
+            "description": "Accès réservé aux administrateurs, managers et agents"
+          },
+          "404": {
+            "description": "Système introuvable"
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Supprimer un système",
+        "description": "Effectue une suppression logique d'un système.",
+        "tags": [
+          "Systems"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Identifiant du système"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Système supprimé avec succès"
+          },
+          "401": {
+            "description": "Non authentifié"
+          },
+          "403": {
+            "description": "Accès réservé aux administrateurs et managers"
+          },
+          "404": {
+            "description": "Système introuvable"
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      }
+    },
+    "/api/stocks": {
+      "post": {
+        "summary": "Créer un stock",
+        "description": "Crée un nouveau stock associé à un contrat de type stock_only ou caution_stock.",
+        "tags": [
+          "Stocks"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "contract_id",
+                  "amount_initial",
+                  "currency"
+                ],
+                "properties": {
+                  "contract_id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "example": "CONTRACT_UUID"
+                  },
+                  "amount_initial": {
+                    "type": "number",
+                    "example": 10000
+                  },
+                  "currency": {
+                    "type": "string",
+                    "example": "USD"
+                  },
+                  "purchased_at": {
+                    "type": "string",
+                    "format": "date",
+                    "example": "2026-05-21"
+                  },
+                  "notes": {
+                    "type": "string",
+                    "example": "Stock principal émission billets"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Stock créé avec succès"
+          },
+          "400": {
+            "description": "Contrat invalide ou données invalides"
+          },
+          "401": {
+            "description": "Non authentifié"
+          },
+          "403": {
+            "description": "Accès réservé aux administrateurs et managers"
+          },
+          "404": {
+            "description": "Contrat introuvable"
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      },
+      "get": {
+        "summary": "Liste des stocks",
+        "description": "Retourne la liste paginée des stocks avec filtres de recherche.",
+        "tags": [
+          "Stocks"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "example": 1
+            },
+            "description": "Numéro de page"
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "example": 10
+            },
+            "description": "Nombre d'éléments par page"
+          },
+          {
+            "in": "query",
+            "name": "search",
+            "schema": {
+              "type": "string",
+              "example": "congo airways"
+            },
+            "description": "Recherche sur les stocks"
+          },
+          {
+            "in": "query",
+            "name": "contract_type",
+            "schema": {
+              "type": "string",
+              "example": "caution_stock"
+            },
+            "description": "Filtrer par type de contrat"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste récupérée avec succès",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Stocks retrieved successfully"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string",
+                                "format": "uuid"
+                              },
+                              "contract_id": {
+                                "type": "string",
+                                "format": "uuid"
+                              },
+                              "partner_name": {
+                                "type": "string",
+                                "example": "Congo Airways"
+                              },
+                              "contract_type": {
+                                "type": "string",
+                                "example": "caution_stock"
+                              },
+                              "amount_initial": {
+                                "type": "string",
+                                "example": "10000.00"
+                              },
+                              "amount_remaining": {
+                                "type": "string",
+                                "example": "10000.00"
+                              },
+                              "currency": {
+                                "type": "string",
+                                "example": "USD"
+                              },
+                              "purchased_at": {
+                                "type": "string",
+                                "format": "date-time",
+                                "example": "2026-05-20T23:00:00.000Z"
+                              },
+                              "notes": {
+                                "type": "string",
+                                "example": "Stock principal émission billets"
+                              },
+                              "is_active": {
+                                "type": "boolean",
+                                "example": true
+                              },
+                              "created_at": {
+                                "type": "string",
+                                "format": "date-time",
+                                "example": "2026-05-21T15:09:23.566Z"
+                              },
+                              "updated_at": {
+                                "type": "string",
+                                "format": "date-time",
+                                "example": "2026-05-21T15:09:23.566Z"
+                              }
+                            }
+                          }
+                        },
+                        "total": {
+                          "type": "integer",
+                          "example": 1
+                        },
+                        "page": {
+                          "type": "integer",
+                          "example": 1
+                        },
+                        "limit": {
+                          "type": "integer",
+                          "example": 10
+                        },
+                        "total_pages": {
+                          "type": "integer",
+                          "example": 1
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Non authentifié"
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      }
+    },
+    "/api/stocks/{id}": {
+      "put": {
+        "summary": "Modifier un stock",
+        "description": "Met à jour un stock. Un stock dont le montant restant atteint zéro est automatiquement désactivé.",
+        "tags": [
+          "Stocks"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Identifiant du stock"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "amount_remaining": {
+                    "type": "number",
+                    "example": 8500
+                  },
+                  "notes": {
+                    "type": "string",
+                    "example": "Ajustement après émission"
+                  },
+                  "is_active": {
+                    "type": "boolean",
+                    "example": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Stock modifié avec succès"
+          },
+          "400": {
+            "description": "Données invalides"
+          },
+          "401": {
+            "description": "Non authentifié"
+          },
+          "403": {
+            "description": "Accès réservé aux administrateurs et managers"
+          },
+          "404": {
+            "description": "Stock introuvable"
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Supprimer un stock",
+        "description": "Effectue une suppression logique d'un stock.",
+        "tags": [
+          "Stocks"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Identifiant du stock"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Stock supprimé avec succès"
+          },
+          "401": {
+            "description": "Non authentifié"
+          },
+          "403": {
+            "description": "Accès réservé aux administrateurs et managers"
+          },
+          "404": {
+            "description": "Stock introuvable"
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      }
+    },
+    "/api/services": {
+      "post": {
+        "summary": "Créer un service",
+        "description": "Crée un nouveau service métier. Une référence interne est automatiquement générée.",
+        "tags": [
+          "Services"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "name"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "Billetterie"
+                  },
+                  "description": {
+                    "type": "string",
+                    "example": "Gestion des billets"
+                  },
+                  "color": {
+                    "type": "string",
+                    "example": "#2563EB"
+                  },
+                  "icon": {
+                    "type": "string",
+                    "example": "plane"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Service créé avec succès"
+          },
+          "400": {
+            "description": "Données invalides"
+          },
+          "401": {
+            "description": "Non authentifié"
+          },
+          "403": {
+            "description": "Accès réservé aux administrateurs, managers et agents"
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      },
+      "get": {
+        "summary": "Liste des services",
+        "description": "Retourne tous les services disponibles.",
+        "tags": [
+          "Services"
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste récupérée avec succès",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Services retrieved successfully"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "name": {
+                            "type": "string",
+                            "example": "Billetterie"
+                          },
+                          "initial": {
+                            "type": "string",
+                            "example": "BIL"
+                          },
+                          "description": {
+                            "type": "string",
+                            "example": "Gestion des billets"
+                          },
+                          "color": {
+                            "type": "string",
+                            "example": "#2563EB"
+                          },
+                          "icon": {
+                            "type": "string",
+                            "example": "plane"
+                          },
+                          "is_active": {
+                            "type": "boolean",
+                            "example": true
+                          },
+                          "created_at": {
+                            "type": "string",
+                            "format": "date-time",
+                            "example": "2026-05-20T12:50:38.156Z"
+                          },
+                          "updated_at": {
+                            "type": "string",
+                            "format": "date-time",
+                            "example": "2026-05-20T12:50:38.156Z"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Non authentifié"
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      }
+    },
+    "/api/services/{id}": {
+      "put": {
+        "summary": "Modifier un service",
+        "description": "Met à jour les informations d'un service.",
+        "tags": [
+          "Services"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Identifiant du service"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "Billetterie"
+                  },
+                  "description": {
+                    "type": "string",
+                    "example": "Gestion des billets internationaux"
+                  },
+                  "color": {
+                    "type": "string",
+                    "example": "#2563EB"
+                  },
+                  "icon": {
+                    "type": "string",
+                    "example": "plane"
+                  },
+                  "is_active": {
+                    "type": "boolean",
+                    "example": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Service modifié avec succès"
+          },
+          "400": {
+            "description": "Données invalides"
+          },
+          "401": {
+            "description": "Non authentifié"
+          },
+          "403": {
+            "description": "Accès réservé aux administrateurs, managers et agents"
+          },
+          "404": {
+            "description": "Service introuvable"
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Supprimer un service",
+        "description": "Effectue une suppression logique d'un service.",
+        "tags": [
+          "Services"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Identifiant du service"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Service supprimé avec succès"
+          },
+          "401": {
+            "description": "Non authentifié"
+          },
+          "403": {
+            "description": "Accès réservé aux administrateurs et managers"
+          },
+          "404": {
+            "description": "Service introuvable"
+          }
+        }
+      }
+    },
+    "/api/service-requests": {
+      "post": {
+        "summary": "Créer une demande de service",
+        "description": "Crée une nouvelle demande de service associée à un client, un service et éventuellement un partenaire.",
+        "tags": [
+          "Service Requests"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "client_id",
+                  "service_id",
+                  "request_type",
+                  "currency"
+                ],
+                "properties": {
+                  "client_id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "example": "CLIENT_UUID"
+                  },
+                  "service_id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "example": "SERVICE_UUID"
+                  },
+                  "partner_id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "example": "PARTNER_UUID"
+                  },
+                  "contract_id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "example": "CONTRACT_UUID"
+                  },
+                  "request_type": {
+                    "type": "string",
+                    "example": "ticketing"
+                  },
+                  "currency": {
+                    "type": "string",
+                    "example": "USD"
+                  },
+                  "observation": {
+                    "type": "string",
+                    "example": "Mission Bruxelles juin 2026"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Demande créée avec succès"
+          },
+          "400": {
+            "description": "Données invalides"
+          },
+          "401": {
+            "description": "Non authentifié"
+          },
+          "403": {
+            "description": "Accès refusé"
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      },
+      "get": {
+        "summary": "Liste des demandes de services",
+        "description": "Retourne la liste paginée des demandes de services.",
+        "tags": [
+          "Service Requests"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "example": 1
+            },
+            "description": "Numéro de page"
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "example": 10
+            },
+            "description": "Nombre d'éléments par page"
+          },
+          {
+            "in": "query",
+            "name": "search",
+            "schema": {
+              "type": "string",
+              "example": "Bruxelles"
+            },
+            "description": "Recherche par référence, client ou observation"
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "schema": {
+              "type": "string",
+              "example": "pending"
+            },
+            "description": "Filtrer par statut"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste récupérée avec succès",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Requests retrieved successfully"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string",
+                                "format": "uuid"
+                              },
+                              "request_reference": {
+                                "type": "string",
+                                "example": "SR-1779449061291-1711"
+                              },
+                              "client_id": {
+                                "type": "string",
+                                "format": "uuid"
+                              },
+                              "client_name": {
+                                "type": "string",
+                                "example": "Equity BCDC"
+                              },
+                              "service_id": {
+                                "type": "string",
+                                "format": "uuid"
+                              },
+                              "service_name": {
+                                "type": "string",
+                                "example": "Billetterie"
+                              },
+                              "partner_id": {
+                                "type": "string",
+                                "format": "uuid"
+                              },
+                              "partner_name": {
+                                "type": "string",
+                                "example": "Congo Airways"
+                              },
+                              "contract_id": {
+                                "type": "string",
+                                "format": "uuid"
+                              },
+                              "request_type": {
+                                "type": "string",
+                                "example": "ticketing"
+                              },
+                              "status": {
+                                "type": "string",
+                                "example": "pending"
+                              },
+                              "total_amount": {
+                                "type": "string",
+                                "example": "1900.00"
+                              },
+                              "amount_paid": {
+                                "type": "string",
+                                "example": "500.00"
+                              },
+                              "remaining_amount": {
+                                "type": "number",
+                                "example": 1400
+                              },
+                              "service_revenue": {
+                                "type": "string",
+                                "example": "51.40"
+                              },
+                              "external_cost": {
+                                "type": "string",
+                                "example": "1848.60"
+                              },
+                              "currency": {
+                                "type": "string",
+                                "example": "USD"
+                              },
+                              "observation": {
+                                "type": "string",
+                                "example": "Mission Bruxelles juin 2026"
+                              },
+                              "requested_at": {
+                                "type": "string",
+                                "format": "date-time",
+                                "example": "2026-05-22T11:24:21.331Z"
+                              },
+                              "completed_at": {
+                                "type": "string",
+                                "nullable": true,
+                                "example": null
+                              },
+                              "created_at": {
+                                "type": "string",
+                                "format": "date-time"
+                              },
+                              "updated_at": {
+                                "type": "string",
+                                "format": "date-time"
+                              }
+                            }
+                          }
+                        },
+                        "total": {
+                          "type": "integer",
+                          "example": 1
+                        },
+                        "page": {
+                          "type": "integer",
+                          "example": 1
+                        },
+                        "limit": {
+                          "type": "integer",
+                          "example": 10
+                        },
+                        "total_pages": {
+                          "type": "integer",
+                          "example": 1
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Non authentifié"
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      }
+    },
+    "/api/service-requests/{id}": {
+      "put": {
+        "summary": "Modifier une demande de service",
+        "description": "Met à jour une demande de service existante.",
+        "tags": [
+          "Service Requests"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Identifiant de la demande"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "status": {
+                    "type": "string",
+                    "example": "completed"
+                  },
+                  "observation": {
+                    "type": "string",
+                    "example": "Voyage confirmé et billet émis"
+                  },
+                  "completed_at": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Demande modifiée avec succès"
+          },
+          "400": {
+            "description": "Données invalides"
+          },
+          "401": {
+            "description": "Non authentifié"
+          },
+          "403": {
+            "description": "Accès réservé aux administrateurs et managers"
+          },
+          "404": {
+            "description": "Demande introuvable"
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Supprimer une demande de service",
+        "description": "Effectue une suppression logique d'une demande de service.",
+        "tags": [
+          "Service Requests"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Identifiant de la demande"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Demande supprimée avec succès"
+          },
+          "401": {
+            "description": "Non authentifié"
+          },
+          "403": {
+            "description": "Accès réservé aux administrateurs et managers"
+          },
+          "404": {
+            "description": "Demande introuvable"
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      }
+    },
+    "/api/service-request-items": {
+      "post": {
+        "summary": "Créer un élément de demande",
+        "description": "Ajoute un billet ou une prestation à une demande de service.",
+        "tags": [
+          "Service Request Items"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "request_id",
+                  "item_type",
+                  "customer_name"
+                ],
+                "properties": {
+                  "request_id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "example": "74fc86a4-f66f-4e8e-a047-684c23033355"
+                  },
+                  "item_type": {
+                    "type": "string",
+                    "example": "ticket"
+                  },
+                  "customer_name": {
+                    "type": "string",
+                    "example": "John Doe"
+                  },
+                  "airline_id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "example": "0cac5b29-f6e7-4a51-a60a-24172182177a"
+                  },
+                  "system_id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "example": "03a1b653-0a8b-4d59-b2e5-02a351d7bdb6"
+                  },
+                  "ticket_number": {
+                    "type": "string",
+                    "example": 821234567890
+                  },
+                  "pnr": {
+                    "type": "string",
+                    "example": "KQ82LP"
+                  },
+                  "route": {
+                    "type": "string",
+                    "example": "Kinshasa - Bruxelles"
+                  },
+                  "travel_class": {
+                    "type": "string",
+                    "example": "Economy"
+                  },
+                  "departure_date": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2026-06-15T08:00:00Z"
+                  },
+                  "issued_at": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2026-05-22T10:00:00Z"
+                  },
+                  "tht_amount": {
+                    "type": "number",
+                    "example": 800
+                  },
+                  "tax_amount": {
+                    "type": "number",
+                    "example": 150
+                  },
+                  "partner_service_fee": {
+                    "type": "number",
+                    "example": 0
+                  },
+                  "service_fee": {
+                    "type": "number",
+                    "example": 0
+                  },
+                  "commission_amount": {
+                    "type": "number",
+                    "example": 25.7
+                  },
+                  "notes": {
+                    "type": "string",
+                    "example": "Mission entreprise"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Élément créé avec succès"
+          },
+          "400": {
+            "description": "Données invalides"
+          },
+          "401": {
+            "description": "Non authentifié"
+          },
+          "403": {
+            "description": "Accès refusé"
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      },
+      "get": {
+        "summary": "Liste des éléments de demandes",
+        "description": "Retourne la liste paginée des éléments liés aux demandes de services.",
+        "tags": [
+          "Service Request Items"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "example": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "example": 10
+            }
+          },
+          {
+            "in": "query",
+            "name": "search",
+            "schema": {
+              "type": "string",
+              "example": 821234567890
+            },
+            "description": "Recherche par ticket, client, PNR ou référence"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste récupérée avec succès",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Items retrieved successfully"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string",
+                                "format": "uuid"
+                              },
+                              "request_id": {
+                                "type": "string",
+                                "format": "uuid"
+                              },
+                              "item_reference": {
+                                "type": "string",
+                                "example": "ITEM-1779454549397-3740"
+                              },
+                              "item_type": {
+                                "type": "string",
+                                "example": "ticket"
+                              },
+                              "item_status": {
+                                "type": "string",
+                                "example": "active"
+                              },
+                              "customer_name": {
+                                "type": "string",
+                                "example": "John Doe"
+                              },
+                              "airline_id": {
+                                "type": "string",
+                                "format": "uuid"
+                              },
+                              "system_id": {
+                                "type": "string",
+                                "format": "uuid"
+                              },
+                              "ticket_number": {
+                                "type": "string",
+                                "example": 821234567890
+                              },
+                              "pnr": {
+                                "type": "string",
+                                "example": "KQ82LP"
+                              },
+                              "route": {
+                                "type": "string",
+                                "example": "Kinshasa - Bruxelles"
+                              },
+                              "travel_class": {
+                                "type": "string",
+                                "example": "Economy"
+                              },
+                              "departure_date": {
+                                "type": "string",
+                                "format": "date-time"
+                              },
+                              "issued_at": {
+                                "type": "string",
+                                "format": "date-time"
+                              },
+                              "tht_amount": {
+                                "type": "string",
+                                "example": "800.00"
+                              },
+                              "tax_amount": {
+                                "type": "string",
+                                "example": "150.00"
+                              },
+                              "partner_service_fee": {
+                                "type": "string",
+                                "example": "0.00"
+                              },
+                              "service_fee": {
+                                "type": "string",
+                                "example": "0.00"
+                              },
+                              "cancellation_fee": {
+                                "type": "string",
+                                "example": "0.00"
+                              },
+                              "modification_fee": {
+                                "type": "string",
+                                "example": "0.00"
+                              },
+                              "commission_amount": {
+                                "type": "string",
+                                "example": "25.70"
+                              },
+                              "ttc_amount": {
+                                "type": "string",
+                                "example": "950.00"
+                              },
+                              "debit_balance": {
+                                "type": "string",
+                                "example": "924.30"
+                              },
+                              "notes": {
+                                "type": "string",
+                                "example": "Mission entreprise"
+                              },
+                              "created_at": {
+                                "type": "string",
+                                "format": "date-time"
+                              }
+                            }
+                          }
+                        },
+                        "total": {
+                          "type": "integer",
+                          "example": 2
+                        },
+                        "page": {
+                          "type": "integer",
+                          "example": 1
+                        },
+                        "limit": {
+                          "type": "integer",
+                          "example": 10
+                        },
+                        "total_pages": {
+                          "type": "integer",
+                          "example": 1
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Non authentifié"
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      }
+    },
+    "/api/service-request-items/{id}": {
+      "put": {
+        "summary": "Modifier un élément",
+        "description": "Met à jour un billet ou une prestation associée à une demande.",
+        "tags": [
+          "Service Request Items"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Identifiant de l'élément"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Élément modifié avec succès"
+          },
+          "400": {
+            "description": "Données invalides"
+          },
+          "401": {
+            "description": "Non authentifié"
+          },
+          "403": {
+            "description": "Accès réservé aux administrateurs et managers"
+          },
+          "404": {
+            "description": "Élément introuvable"
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Supprimer un élément",
+        "description": "Effectue une suppression logique d'un élément de demande.",
+        "tags": [
+          "Service Request Items"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Identifiant de l'élément"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Élément supprimé avec succès"
+          },
+          "401": {
+            "description": "Non authentifié"
+          },
+          "403": {
+            "description": "Accès réservé aux administrateurs"
+          },
+          "404": {
+            "description": "Élément introuvable"
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      }
+    },
+    "/api/partners": {
+      "post": {
+        "summary": "Créer un partenaire",
+        "description": "Crée un nouveau partenaire commercial.",
+        "tags": [
+          "Partners"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "name",
+                  "type"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "Congo Airways"
+                  },
+                  "type": {
+                    "type": "string",
+                    "example": "company",
+                    "description": "company ou individual"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Partenaire créé avec succès"
+          },
+          "400": {
+            "description": "Données invalides"
+          },
+          "401": {
+            "description": "Non authentifié"
+          },
+          "403": {
+            "description": "Accès réservé aux administrateurs et agents"
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      },
+      "get": {
+        "summary": "Liste des partenaires",
+        "description": "Retourne la liste de tous les partenaires actifs.",
+        "tags": [
+          "Partners"
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste récupérée avec succès",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Partners retrieved successfully"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "name": {
+                            "type": "string",
+                            "example": "Congo Airways"
+                          },
+                          "type": {
+                            "type": "string",
+                            "example": "company"
+                          },
+                          "is_active": {
+                            "type": "boolean",
+                            "example": true
+                          },
+                          "created_at": {
+                            "type": "string",
+                            "format": "date-time",
+                            "example": "2026-05-20T13:45:05.096Z"
+                          },
+                          "updated_at": {
+                            "type": "string",
+                            "format": "date-time",
+                            "example": "2026-05-20T13:45:05.096Z"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Non authentifié"
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      }
+    },
+    "/api/partners/{id}": {
+      "put": {
+        "summary": "Modifier un partenaire",
+        "description": "Met à jour les informations d'un partenaire.",
+        "tags": [
+          "Partners"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Identifiant du partenaire"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "Congo Airways"
+                  },
+                  "type": {
+                    "type": "string",
+                    "example": "company"
+                  },
+                  "is_active": {
+                    "type": "boolean",
+                    "example": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Partenaire modifié avec succès"
+          },
+          "400": {
+            "description": "Données invalides"
+          },
+          "401": {
+            "description": "Non authentifié"
+          },
+          "403": {
+            "description": "Accès réservé aux administrateurs et agents"
+          },
+          "404": {
+            "description": "Partenaire introuvable"
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Supprimer un partenaire",
+        "description": "Effectue une suppression logique d'un partenaire.",
+        "tags": [
+          "Partners"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Identifiant du partenaire"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Partenaire supprimé avec succès"
+          },
+          "401": {
+            "description": "Non authentifié"
+          },
+          "403": {
+            "description": "Accès réservé aux administrateurs"
+          },
+          "404": {
+            "description": "Partenaire introuvable"
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      }
+    },
+    "/api/financial-ledger": {
+      "get": {
+        "summary": "Liste des écritures comptables",
+        "description": "Retourne la liste paginée des mouvements financiers enregistrés dans le grand livre.",
+        "tags": [
+          "Financial Ledger"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "example": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "example": 10
+            }
+          },
+          {
+            "in": "query",
+            "name": "search",
+            "schema": {
+              "type": "string",
+              "example": "LEDGER-001"
+            }
+          },
+          {
+            "in": "query",
+            "name": "request_reference",
+            "schema": {
+              "type": "string",
+              "example": "SR-1779449061291-1711"
+            }
+          },
+          {
+            "in": "query",
+            "name": "entry_type",
+            "schema": {
+              "type": "string",
+              "example": "revenue"
+            }
+          },
+          {
+            "in": "query",
+            "name": "direction",
+            "schema": {
+              "type": "string",
+              "example": "income"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Écritures récupérées avec succès",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Financial ledger retrieved successfully"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string",
+                                "format": "uuid"
+                              },
+                              "request_id": {
+                                "type": "string",
+                                "format": "uuid"
+                              },
+                              "item_id": {
+                                "type": "string",
+                                "format": "uuid",
+                                "nullable": true
+                              },
+                              "payment_id": {
+                                "type": "string",
+                                "format": "uuid",
+                                "nullable": true
+                              },
+                              "service_id": {
+                                "type": "string",
+                                "format": "uuid"
+                              },
+                              "partner_id": {
+                                "type": "string",
+                                "format": "uuid"
+                              },
+                              "client_id": {
+                                "type": "string",
+                                "format": "uuid"
+                              },
+                              "contract_id": {
+                                "type": "string",
+                                "format": "uuid"
+                              },
+                              "ledger_reference": {
+                                "type": "string",
+                                "example": "LEDGER-20260522-001"
+                              },
+                              "request_reference": {
+                                "type": "string",
+                                "example": "SR-1779449061291-1711"
+                              },
+                              "source_module": {
+                                "type": "string",
+                                "example": "customer_payment"
+                              },
+                              "operation_type": {
+                                "type": "string",
+                                "example": "payment"
+                              },
+                              "entry_type": {
+                                "type": "string",
+                                "example": "revenue"
+                              },
+                              "direction": {
+                                "type": "string",
+                                "example": "income"
+                              },
+                              "amount": {
+                                "type": "string",
+                                "example": "500.00"
+                              },
+                              "currency": {
+                                "type": "string",
+                                "example": "USD"
+                              },
+                              "client_name": {
+                                "type": "string",
+                                "example": "Equity BCDC"
+                              },
+                              "service_name": {
+                                "type": "string",
+                                "example": "Billetterie"
+                              },
+                              "partner_name": {
+                                "type": "string",
+                                "example": "Congo Airways"
+                              },
+                              "description": {
+                                "type": "string",
+                                "example": "Paiement client enregistré"
+                              },
+                              "created_at": {
+                                "type": "string",
+                                "format": "date-time"
+                              }
+                            }
+                          }
+                        },
+                        "total": {
+                          "type": "integer",
+                          "example": 25
+                        },
+                        "page": {
+                          "type": "integer",
+                          "example": 1
+                        },
+                        "limit": {
+                          "type": "integer",
+                          "example": 10
+                        },
+                        "total_pages": {
+                          "type": "integer",
+                          "example": 3
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/financial-ledger/{id}": {
+      "get": {
+        "summary": "Détail d'une écriture comptable",
+        "description": "Retourne les informations détaillées d'une écriture du grand livre financier.",
+        "tags": [
+          "Financial Ledger"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Identifiant de l'écriture comptable"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Écriture récupérée avec succès"
+          },
+          "401": {
+            "description": "Non authentifié"
+          },
+          "404": {
+            "description": "Écriture introuvable"
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      }
+    },
+    "/api/financial-consistency/check": {
+      "get": {
+        "summary": "Vérification globale",
+        "description": "Exécute tous les contrôles de cohérence financière et retourne les anomalies détectées.",
+        "tags": [
+          "Financial Consistency"
+        ],
+        "responses": {
+          "200": {
+            "description": "Vérification effectuée avec succès"
+          },
+          "401": {
+            "description": "Non authentifié"
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      }
+    },
+    "/api/financial-consistency/overpaid-requests": {
+      "get": {
+        "summary": "Dossiers trop payés",
+        "description": "Retourne les demandes dont le montant payé dépasse le montant total dû.",
+        "tags": [
+          "Financial Consistency"
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste récupérée avec succès"
+          },
+          "401": {
+            "description": "Non authentifié"
+          }
+        }
+      }
+    },
+    "/api/financial-consistency/negative-balances": {
+      "get": {
+        "summary": "Soldes négatifs",
+        "description": "Retourne les demandes présentant un solde restant négatif.",
+        "tags": [
+          "Financial Consistency"
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste récupérée avec succès"
+          },
+          "401": {
+            "description": "Non authentifié"
+          }
+        }
+      }
+    },
+    "/api/financial-consistency/invalid-completed-requests": {
+      "get": {
+        "summary": "Dossiers terminés incohérents",
+        "description": "Retourne les demandes marquées comme completed alors qu'un solde reste à payer.",
+        "tags": [
+          "Financial Consistency"
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste récupérée avec succès"
+          },
+          "401": {
+            "description": "Non authentifié"
+          }
+        }
+      }
+    },
+    "/api/financial-consistency/invalid-pending-requests": {
+      "get": {
+        "summary": "Dossiers pending incohérents",
+        "description": "Retourne les demandes marquées pending alors qu'aucun solde n'est dû.",
+        "tags": [
+          "Financial Consistency"
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste récupérée avec succès"
+          },
+          "401": {
+            "description": "Non authentifié"
+          }
+        }
+      }
+    },
+    "/api/financial-consistency/missing-payment-ledgers": {
+      "get": {
+        "summary": "Paiements sans écriture comptable",
+        "description": "Retourne les paiements clients ne possédant aucune entrée dans le grand livre financier.",
+        "tags": [
+          "Financial Consistency"
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste récupérée avec succès"
+          },
+          "401": {
+            "description": "Non authentifié"
+          }
+        }
+      }
+    },
+    "/api/financial-consistency/negative-caution-balances": {
+      "get": {
+        "summary": "Cautions négatives",
+        "description": "Retourne les cautions dont le montant restant est inférieur à zéro.",
+        "tags": [
+          "Financial Consistency"
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste récupérée avec succès"
+          },
+          "401": {
+            "description": "Non authentifié"
+          }
+        }
+      }
+    },
+    "/api/financial-consistency/negative-stock-balances": {
+      "get": {
+        "summary": "Stocks négatifs",
+        "description": "Retourne les stocks dont le montant restant est inférieur à zéro.",
+        "tags": [
+          "Financial Consistency"
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste récupérée avec succès"
+          },
+          "401": {
+            "description": "Non authentifié"
+          }
+        }
+      }
+    },
+    "/api/financial-consistency/cancelled-without-adjustment": {
+      "get": {
+        "summary": "Tickets annulés sans ajustement",
+        "description": "Retourne les billets annulés qui ne possèdent aucun ajustement associé.",
+        "tags": [
+          "Financial Consistency"
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste récupérée avec succès"
+          },
+          "401": {
+            "description": "Non authentifié"
+          }
+        }
+      }
+    },
+    "/api/financial-consistency/refund-without-expense-ledger": {
+      "get": {
+        "summary": "Remboursements sans écriture de dépense",
+        "description": "Retourne les remboursements clients qui ne possèdent aucune écriture comptable de type expense.",
+        "tags": [
+          "Financial Consistency"
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste récupérée avec succès"
+          },
+          "401": {
+            "description": "Non authentifié"
+          }
+        }
+      }
+    },
+    "/api/dashboard/overview": {
+      "get": {
+        "summary": "Tableau de bord global",
+        "description": "Retourne l'ensemble des indicateurs financiers, opérationnels et commerciaux.",
+        "tags": [
+          "Dashboard"
+        ],
+        "responses": {
+          "200": {
+            "description": "Dashboard récupéré avec succès",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Dashboard retrieved successfully"
+                    },
+                    "data": {
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/dashboard/monthly-revenue": {
+      "get": {
+        "summary": "Revenus mensuels",
+        "description": "Retourne les revenus regroupés par mois.",
+        "tags": [
+          "Dashboard"
+        ],
+        "responses": {
+          "200": {
+            "description": "Revenus récupérés avec succès",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "month": {
+                            "type": "string",
+                            "example": "2026-01"
+                          },
+                          "income": {
+                            "type": "string",
+                            "example": "12000.00"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/dashboard/monthly-cashflow": {
+      "get": {
+        "summary": "Cashflow mensuel",
+        "description": "Retourne les revenus, dépenses et cashflow net par mois.",
+        "tags": [
+          "Dashboard"
+        ],
+        "responses": {
+          "200": {
+            "description": "Cashflow récupéré avec succès",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "month": {
+                            "type": "string",
+                            "example": "2026-01"
+                          },
+                          "total_income": {
+                            "type": "string",
+                            "example": "12000.00"
+                          },
+                          "total_expense": {
+                            "type": "string",
+                            "example": "4000.00"
+                          },
+                          "net_cashflow": {
+                            "type": "string",
+                            "example": "8000.00"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/dashboard/daily-revenue-chart": {
+      "get": {
+        "summary": "Revenus journaliers",
+        "description": "Retourne les revenus journaliers pour affichage graphique.",
+        "tags": [
+          "Dashboard"
+        ],
+        "responses": {
+          "200": {
+            "description": "Données récupérées avec succès",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "day": {
+                            "type": "string",
+                            "example": "2026-05-01"
+                          },
+                          "revenue": {
+                            "type": "string",
+                            "example": "900.00"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/dashboard/airline-profits": {
+      "get": {
+        "summary": "Profit par compagnie",
+        "description": "Retourne les profits générés par compagnie aérienne.",
+        "tags": [
+          "Dashboard"
+        ],
+        "responses": {
+          "200": {
+            "description": "Données récupérées avec succès",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "string",
+                            "example": "Ethiopian Airlines"
+                          },
+                          "profit": {
+                            "type": "string",
+                            "example": "4500.00"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/dashboard/cancellation-losses": {
+      "get": {
+        "summary": "Pertes liées aux annulations",
+        "description": "Retourne le montant total des pertes liées aux annulations.",
+        "tags": [
+          "Dashboard"
+        ],
+        "responses": {
+          "200": {
+            "description": "Données récupérées avec succès",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "cancellation_losses": {
+                          "type": "string",
+                          "example": "1200.00"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/dashboard/critical-alerts": {
+      "get": {
+        "summary": "Alertes critiques",
+        "description": "Retourne les alertes nécessitant une intervention.",
+        "tags": [
+          "Dashboard"
+        ]
+      }
+    },
+    "/api/dashboard/top-airlines": {
+      "get": {
+        "summary": "Top compagnies aériennes",
+        "description": "Classement des compagnies générant le plus d'activité.",
+        "tags": [
+          "Dashboard"
+        ]
+      }
+    },
+    "/api/dashboard/top-clients": {
+      "get": {
+        "summary": "Top clients",
+        "description": "Classement des clients générant le plus de chiffre d'affaires.",
+        "tags": [
+          "Dashboard"
+        ]
+      }
+    },
+    "/api/dashboard/low-balances": {
+      "get": {
+        "summary": "Contrats à faible solde",
+        "description": "Retourne les contrats dont la caution ou le stock approche de zéro.",
+        "tags": [
+          "Dashboard"
+        ]
+      }
+    },
+    "/api/customer-payments": {
+      "post": {
+        "summary": "Enregistrer un paiement client",
+        "description": "Enregistre un paiement ou un remboursement associé à une demande de service.",
+        "tags": [
+          "Customer Payments"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "request_id",
+                  "payment_method",
+                  "payment_type",
+                  "amount",
+                  "currency"
+                ],
+                "properties": {
+                  "request_id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "example": "REQUEST_UUID"
+                  },
+                  "payment_method": {
+                    "type": "string",
+                    "example": "cash"
+                  },
+                  "payment_type": {
+                    "type": "string",
+                    "example": "payment",
+                    "description": "payment ou refund"
+                  },
+                  "amount": {
+                    "type": "number",
+                    "example": 500
+                  },
+                  "currency": {
+                    "type": "string",
+                    "example": "USD"
+                  },
+                  "observation": {
+                    "type": "string",
+                    "example": "Premier acompte"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Paiement enregistré avec succès"
+          },
+          "400": {
+            "description": "Données invalides"
+          },
+          "401": {
+            "description": "Non authentifié"
+          },
+          "403": {
+            "description": "Accès refusé"
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      },
+      "get": {
+        "summary": "Liste des paiements clients",
+        "description": "Retourne la liste paginée des paiements et remboursements enregistrés.",
+        "tags": [
+          "Customer Payments"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "example": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "example": 10
+            }
+          },
+          {
+            "in": "query",
+            "name": "search",
+            "schema": {
+              "type": "string",
+              "example": "PAY-1779456533364-7560"
+            },
+            "description": "Recherche par référence de paiement"
+          },
+          {
+            "in": "query",
+            "name": "payment_type",
+            "schema": {
+              "type": "string",
+              "example": "payment"
+            },
+            "description": "payment ou refund"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paiements récupérés avec succès",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Payments retrieved successfully"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string",
+                                "format": "uuid"
+                              },
+                              "request_id": {
+                                "type": "string",
+                                "format": "uuid"
+                              },
+                              "payment_reference": {
+                                "type": "string",
+                                "example": "PAY-1779456533364-7560"
+                              },
+                              "payment_method": {
+                                "type": "string",
+                                "example": "cash"
+                              },
+                              "payment_type": {
+                                "type": "string",
+                                "example": "payment"
+                              },
+                              "amount": {
+                                "type": "string",
+                                "example": "500.00"
+                              },
+                              "currency": {
+                                "type": "string",
+                                "example": "USD"
+                              },
+                              "payment_date": {
+                                "type": "string",
+                                "format": "date-time",
+                                "example": "2026-05-22T13:28:53.408Z"
+                              },
+                              "observation": {
+                                "type": "string",
+                                "example": "Premier acompte"
+                              },
+                              "created_at": {
+                                "type": "string",
+                                "format": "date-time",
+                                "example": "2026-05-22T13:28:53.408Z"
+                              }
+                            }
+                          }
+                        },
+                        "total": {
+                          "type": "integer",
+                          "example": 1
+                        },
+                        "page": {
+                          "type": "integer",
+                          "example": 1
+                        },
+                        "limit": {
+                          "type": "integer",
+                          "example": 10
+                        },
+                        "total_pages": {
+                          "type": "integer",
+                          "example": 1
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Non authentifié"
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      }
+    },
+    "/api/customer-payments/{id}": {
+      "put": {
+        "summary": "Modifier un paiement client",
+        "description": "Met à jour les informations d'un paiement ou remboursement.",
+        "tags": [
+          "Customer Payments"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Identifiant du paiement"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "payment_method": {
+                    "type": "string",
+                    "example": "bank_transfer"
+                  },
+                  "amount": {
+                    "type": "number",
+                    "example": 750
+                  },
+                  "observation": {
+                    "type": "string",
+                    "example": "Paiement corrigé après rapprochement bancaire"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Paiement modifié avec succès"
+          },
+          "400": {
+            "description": "Données invalides"
+          },
+          "401": {
+            "description": "Non authentifié"
+          },
+          "403": {
+            "description": "Accès refusé"
+          },
+          "404": {
+            "description": "Paiement introuvable"
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Supprimer un paiement client",
+        "description": "Effectue une suppression logique d'un paiement ou remboursement.",
+        "tags": [
+          "Customer Payments"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Identifiant du paiement"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paiement supprimé avec succès"
+          },
+          "401": {
+            "description": "Non authentifié"
+          },
+          "403": {
+            "description": "Accès refusé"
+          },
+          "404": {
+            "description": "Paiement introuvable"
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      }
+    },
+    "/api/contracts": {
+      "post": {
+        "summary": "Créer un contrat",
+        "description": "Crée un nouveau contrat associé à un partenaire.",
+        "tags": [
+          "Contracts"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "partner_id",
+                  "contract_type",
+                  "status",
+                  "start_date"
+                ],
+                "properties": {
+                  "partner_id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "example": "PARTNER_UUID"
+                  },
+                  "contract_type": {
+                    "type": "string",
+                    "example": "caution_stock",
+                    "description": "caution_only, stock_only ou caution_stock"
+                  },
+                  "status": {
+                    "type": "string",
+                    "example": "active"
+                  },
+                  "start_date": {
+                    "type": "string",
+                    "format": "date",
+                    "example": "2026-05-20"
+                  },
+                  "end_date": {
+                    "type": "string",
+                    "format": "date",
+                    "example": "2027-05-20"
+                  },
+                  "description": {
+                    "type": "string",
+                    "example": "Contrat principal billetterie"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Contrat créé avec succès"
+          },
+          "400": {
+            "description": "Données invalides"
+          },
+          "401": {
+            "description": "Non authentifié"
+          },
+          "403": {
+            "description": "Accès réservé aux administrateurs et managers"
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      },
+      "get": {
+        "summary": "Liste des contrats",
+        "description": "Retourne la liste paginée des contrats.",
+        "tags": [
+          "Contracts"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "example": 1
+            },
+            "description": "Numéro de page"
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "example": 10
+            },
+            "description": "Nombre d'éléments par page"
+          },
+          {
+            "in": "query",
+            "name": "search",
+            "schema": {
+              "type": "string",
+              "example": "billetterie"
+            },
+            "description": "Recherche sur les contrats"
+          },
+          {
+            "in": "query",
+            "name": "contract_type",
+            "schema": {
+              "type": "string",
+              "example": "caution_stock"
+            },
+            "description": "Filtrer par type de contrat"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste récupérée avec succès",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Contracts retrieved successfully"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string",
+                                "format": "uuid"
+                              },
+                              "partner_id": {
+                                "type": "string",
+                                "format": "uuid"
+                              },
+                              "contract_type": {
+                                "type": "string",
+                                "example": "caution_stock"
+                              },
+                              "status": {
+                                "type": "string",
+                                "example": "active"
+                              },
+                              "start_date": {
+                                "type": "string",
+                                "format": "date-time",
+                                "example": "2026-05-19T23:00:00.000Z"
+                              },
+                              "end_date": {
+                                "type": "string",
+                                "format": "date-time",
+                                "example": "2027-05-19T23:00:00.000Z"
+                              },
+                              "description": {
+                                "type": "string",
+                                "example": "Contrat principal billetterie"
+                              },
+                              "is_active": {
+                                "type": "boolean",
+                                "example": true
+                              },
+                              "created_at": {
+                                "type": "string",
+                                "format": "date-time",
+                                "example": "2026-05-20T14:24:15.119Z"
+                              },
+                              "updated_at": {
+                                "type": "string",
+                                "format": "date-time",
+                                "example": "2026-05-20T14:24:15.119Z"
+                              }
+                            }
+                          }
+                        },
+                        "total": {
+                          "type": "integer",
+                          "example": 1
+                        },
+                        "page": {
+                          "type": "integer",
+                          "example": 1
+                        },
+                        "limit": {
+                          "type": "integer",
+                          "example": 10
+                        },
+                        "total_pages": {
+                          "type": "integer",
+                          "example": 1
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Non authentifié"
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      }
+    },
+    "/api/contracts/{id}": {
+      "put": {
+        "summary": "Modifier un contrat",
+        "description": "Met à jour les informations d'un contrat.",
+        "tags": [
+          "Contracts"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Identifiant du contrat"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "contract_type": {
+                    "type": "string",
+                    "example": "caution_stock"
+                  },
+                  "status": {
+                    "type": "string",
+                    "example": "active"
+                  },
+                  "start_date": {
+                    "type": "string",
+                    "format": "date",
+                    "example": "2026-05-20"
+                  },
+                  "end_date": {
+                    "type": "string",
+                    "format": "date",
+                    "example": "2027-05-20"
+                  },
+                  "description": {
+                    "type": "string",
+                    "example": "Contrat principal billetterie"
+                  },
+                  "is_active": {
+                    "type": "boolean",
+                    "example": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Contrat modifié avec succès"
+          },
+          "400": {
+            "description": "Données invalides"
+          },
+          "401": {
+            "description": "Non authentifié"
+          },
+          "403": {
+            "description": "Accès réservé aux administrateurs et managers"
+          },
+          "404": {
+            "description": "Contrat introuvable"
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Supprimer un contrat",
+        "description": "Effectue une suppression logique d'un contrat.",
+        "tags": [
+          "Contracts"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Identifiant du contrat"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Contrat supprimé avec succès"
+          },
+          "401": {
+            "description": "Non authentifié"
+          },
+          "403": {
+            "description": "Accès réservé aux administrateurs et managers"
+          },
+          "404": {
+            "description": "Contrat introuvable"
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      }
+    },
+    "/api/clients": {
+      "post": {
+        "summary": "Créer un client",
+        "description": "Crée un nouveau client particulier ou entreprise.",
+        "tags": [
+          "Clients"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "name",
+                  "client_type"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "Equity BCDC"
+                  },
+                  "client_type": {
+                    "type": "string",
+                    "example": "company",
+                    "description": "individual ou company"
+                  },
+                  "phone": {
+                    "type": "string",
+                    "example": 243000000
+                  },
+                  "email": {
+                    "type": "string",
+                    "example": "contact@equity.com"
+                  },
+                  "address": {
+                    "type": "string",
+                    "example": "Kinshasa"
+                  },
+                  "contact_person": {
+                    "type": "string",
+                    "example": "John Doe"
+                  },
+                  "tax_number": {
+                    "type": "string",
+                    "example": "RCCM123"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Client créé avec succès"
+          },
+          "400": {
+            "description": "Données invalides"
+          },
+          "401": {
+            "description": "Non authentifié"
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      },
+      "get": {
+        "summary": "Liste des clients",
+        "description": "Retourne la liste paginée des clients avec filtres de recherche.",
+        "tags": [
+          "Clients"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "example": 1
+            },
+            "description": "Numéro de page"
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "example": 10
+            },
+            "description": "Nombre d'éléments par page"
+          },
+          {
+            "in": "query",
+            "name": "search",
+            "schema": {
+              "type": "string",
+              "example": "equity"
+            },
+            "description": "Recherche par nom, email ou téléphone"
+          },
+          {
+            "in": "query",
+            "name": "client_type",
+            "schema": {
+              "type": "string",
+              "example": "company"
+            },
+            "description": "Filtrer par type de client"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste récupérée avec succès",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Clients retrieved successfully"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string",
+                                "format": "uuid"
+                              },
+                              "name": {
+                                "type": "string",
+                                "example": "Equity BCDC"
+                              },
+                              "client_type": {
+                                "type": "string",
+                                "example": "company"
+                              },
+                              "phone": {
+                                "type": "string",
+                                "example": 243000000
+                              },
+                              "email": {
+                                "type": "string",
+                                "example": "contact@equity.com"
+                              },
+                              "address": {
+                                "type": "string",
+                                "example": "Kinshasa"
+                              },
+                              "contact_person": {
+                                "type": "string",
+                                "example": "John Doe"
+                              },
+                              "tax_number": {
+                                "type": "string",
+                                "example": "RCCM123"
+                              },
+                              "created_at": {
+                                "type": "string",
+                                "format": "date-time",
+                                "example": "2026-05-20T10:34:18.522Z"
+                              },
+                              "updated_at": {
+                                "type": "string",
+                                "format": "date-time",
+                                "example": "2026-05-20T10:34:18.522Z"
+                              }
+                            }
+                          }
+                        },
+                        "total": {
+                          "type": "integer",
+                          "example": 1
+                        },
+                        "page": {
+                          "type": "integer",
+                          "example": 1
+                        },
+                        "limit": {
+                          "type": "integer",
+                          "example": 10
+                        },
+                        "total_pages": {
+                          "type": "integer",
+                          "example": 1
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Non authentifié"
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      }
+    },
+    "/api/clients/{id}": {
+      "put": {
+        "summary": "Modifier un client",
+        "description": "Met à jour les informations d'un client existant.",
+        "tags": [
+          "Clients"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Identifiant du client"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "Equity BCDC SA"
+                  },
+                  "phone": {
+                    "type": "string",
+                    "example": 243999999999
+                  },
+                  "email": {
+                    "type": "string",
+                    "example": "support@equity.com"
+                  },
+                  "address": {
+                    "type": "string",
+                    "example": "Kinshasa Gombe"
+                  },
+                  "contact_person": {
+                    "type": "string",
+                    "example": "Jane Doe"
+                  },
+                  "tax_number": {
+                    "type": "string",
+                    "example": "RCCM456"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Client modifié avec succès"
+          },
+          "400": {
+            "description": "Données invalides"
+          },
+          "401": {
+            "description": "Non authentifié"
+          },
+          "404": {
+            "description": "Client introuvable"
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Supprimer un client",
+        "description": "Suppression logique d'un client.",
+        "tags": [
+          "Clients"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Identifiant du client"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Client supprimé avec succès"
+          },
+          "401": {
+            "description": "Non authentifié"
+          },
+          "404": {
+            "description": "Client introuvable"
+          }
+        }
+      }
+    },
+    "/api/cautions": {
+      "post": {
+        "summary": "Créer une caution",
+        "description": "Crée une nouvelle caution associée à un contrat de type caution_only ou caution_stock.",
+        "tags": [
+          "Cautions"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "contract_id",
+                  "amount_initial",
+                  "currency"
+                ],
+                "properties": {
+                  "contract_id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "example": "CONTRACT_UUID"
+                  },
+                  "amount_initial": {
+                    "type": "number",
+                    "example": 5000
+                  },
+                  "currency": {
+                    "type": "string",
+                    "example": "USD"
+                  },
+                  "deposited_at": {
+                    "type": "string",
+                    "format": "date",
+                    "example": "2026-05-20"
+                  },
+                  "notes": {
+                    "type": "string",
+                    "example": "Caution principale Ethiopian Airlines"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Caution créée avec succès"
+          },
+          "400": {
+            "description": "Contrat invalide ou données invalides"
+          },
+          "401": {
+            "description": "Non authentifié"
+          },
+          "403": {
+            "description": "Accès réservé aux administrateurs, managers et comptables"
+          },
+          "404": {
+            "description": "Contrat introuvable"
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      },
+      "get": {
+        "summary": "Liste des cautions",
+        "description": "Retourne la liste paginée des cautions avec filtres de recherche.",
+        "tags": [
+          "Cautions"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "example": 1
+            },
+            "description": "Numéro de page"
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "example": 10
+            },
+            "description": "Nombre d'éléments par page"
+          },
+          {
+            "in": "query",
+            "name": "search",
+            "schema": {
+              "type": "string",
+              "example": "ethiopian"
+            },
+            "description": "Recherche sur les cautions"
+          },
+          {
+            "in": "query",
+            "name": "contract_type",
+            "schema": {
+              "type": "string",
+              "example": "caution_stock"
+            },
+            "description": "Filtrer par type de contrat"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste récupérée avec succès",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Cautions retrieved successfully"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string",
+                                "format": "uuid"
+                              },
+                              "contract_id": {
+                                "type": "string",
+                                "format": "uuid"
+                              },
+                              "partner_name": {
+                                "type": "string",
+                                "example": "Congo Airways"
+                              },
+                              "contract_type": {
+                                "type": "string",
+                                "example": "caution_stock"
+                              },
+                              "amount_initial": {
+                                "type": "string",
+                                "example": "5000.00"
+                              },
+                              "amount_remaining": {
+                                "type": "string",
+                                "example": "5000.00"
+                              },
+                              "currency": {
+                                "type": "string",
+                                "example": "USD"
+                              },
+                              "deposited_at": {
+                                "type": "string",
+                                "format": "date-time",
+                                "example": "2026-05-19T23:00:00.000Z"
+                              },
+                              "notes": {
+                                "type": "string",
+                                "example": "Caution principale Ethiopian Airlines"
+                              },
+                              "is_active": {
+                                "type": "boolean",
+                                "example": true
+                              },
+                              "created_at": {
+                                "type": "string",
+                                "format": "date-time",
+                                "example": "2026-05-21T14:56:57.528Z"
+                              },
+                              "updated_at": {
+                                "type": "string",
+                                "format": "date-time",
+                                "example": "2026-05-21T14:56:57.528Z"
+                              }
+                            }
+                          }
+                        },
+                        "total": {
+                          "type": "integer",
+                          "example": 1
+                        },
+                        "page": {
+                          "type": "integer",
+                          "example": 1
+                        },
+                        "limit": {
+                          "type": "integer",
+                          "example": 10
+                        },
+                        "total_pages": {
+                          "type": "integer",
+                          "example": 1
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Non authentifié"
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      }
+    },
+    "/api/cautions/{id}": {
+      "put": {
+        "summary": "Modifier une caution",
+        "description": "Met à jour une caution. Une caution dont le montant restant atteint zéro est automatiquement désactivée.",
+        "tags": [
+          "Cautions"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Identifiant de la caution"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "amount_remaining": {
+                    "type": "number",
+                    "example": 4200
+                  },
+                  "notes": {
+                    "type": "string",
+                    "example": "Mise à jour après émission"
+                  },
+                  "is_active": {
+                    "type": "boolean",
+                    "example": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Caution modifiée avec succès"
+          },
+          "400": {
+            "description": "Données invalides"
+          },
+          "401": {
+            "description": "Non authentifié"
+          },
+          "403": {
+            "description": "Accès réservé aux administrateurs, managers et comptables"
+          },
+          "404": {
+            "description": "Caution introuvable"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Supprimer une caution",
+        "description": "Effectue une suppression logique d'une caution.",
+        "tags": [
+          "Cautions"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Identifiant de la caution"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Caution supprimée avec succès"
+          },
+          "401": {
+            "description": "Non authentifié"
+          },
+          "403": {
+            "description": "Accès réservé aux administrateurs et managers"
+          },
+          "404": {
+            "description": "Caution introuvable"
+          }
+        }
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "summary": "Authentification utilisateur",
+        "description": "Permet à un utilisateur de se connecter et d'obtenir un token JWT.",
+        "tags": [
+          "Authentication"
+        ],
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "email",
+                  "password"
+                ],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "example": "faith@gmail.com"
+                  },
+                  "password": {
+                    "type": "string",
+                    "example": "Admin@2026"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Authentification réussie",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Login successful"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "token": {
+                          "type": "string",
+                          "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                        },
+                        "user": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "format": "uuid"
+                            },
+                            "username": {
+                              "type": "string",
+                              "example": "dido"
+                            },
+                            "full_name": {
+                              "type": "string",
+                              "example": "Dido Kapanga"
+                            },
+                            "email": {
+                              "type": "string",
+                              "example": "faith@gmail.com"
+                            },
+                            "role": {
+                              "type": "string",
+                              "example": "admin"
+                            },
+                            "is_active": {
+                              "type": "boolean",
+                              "example": true
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Données invalides"
+          },
+          "401": {
+            "description": "Identifiants invalides"
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      }
+    },
+    "/api/auth/me": {
+      "get": {
+        "summary": "Informations utilisateur connecté",
+        "description": "Retourne les informations du compte associé au token JWT.",
+        "tags": [
+          "Authentication"
+        ],
+        "responses": {
+          "200": {
+            "description": "Informations utilisateur récupérées",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Current user retrieved successfully"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "username": {
+                          "type": "string",
+                          "example": "dido"
+                        },
+                        "full_name": {
+                          "type": "string",
+                          "example": "Dido Kapanga"
+                        },
+                        "email": {
+                          "type": "string",
+                          "example": "kapangadido@gmail.com"
+                        },
+                        "role": {
+                          "type": "string",
+                          "example": "admin"
+                        },
+                        "is_active": {
+                          "type": "boolean",
+                          "example": true
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token invalide ou expiré"
+          },
+          "404": {
+            "description": "Utilisateur introuvable"
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      }
+    },
+    "/api/audit-logs": {
+      "get": {
+        "summary": "Consulter les journaux d'audit",
+        "description": "Retourne les journaux d'audit avec possibilités de filtrage et pagination.",
+        "tags": [
+          "Audit Logs"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "example": 1
+            },
+            "description": "Numéro de page"
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "example": 20
+            },
+            "description": "Nombre d'éléments par page"
+          },
+          {
+            "in": "query",
+            "name": "module",
+            "schema": {
+              "type": "string",
+              "example": "clients"
+            },
+            "description": "Filtrer par module"
+          },
+          {
+            "in": "query",
+            "name": "action_type",
+            "schema": {
+              "type": "string",
+              "example": "create"
+            },
+            "description": "Filtrer par type d'action"
+          },
+          {
+            "in": "query",
+            "name": "actor_id",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Filtrer par utilisateur"
+          },
+          {
+            "in": "query",
+            "name": "start_date",
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "example": "2026-05-01"
+            },
+            "description": "Date de début"
+          },
+          {
+            "in": "query",
+            "name": "end_date",
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "example": "2026-05-31"
+            },
+            "description": "Date de fin"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Journaux récupérés avec succès",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Audit logs retrieved successfully"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string",
+                                "format": "uuid"
+                              },
+                              "module": {
+                                "type": "string",
+                                "example": "clients"
+                              },
+                              "entity_id": {
+                                "type": "string",
+                                "format": "uuid"
+                              },
+                              "action_type": {
+                                "type": "string",
+                                "example": "create"
+                              },
+                              "actor_id": {
+                                "type": "string",
+                                "format": "uuid"
+                              },
+                              "actor_name": {
+                                "type": "string",
+                                "example": "Dido Kapanga"
+                              },
+                              "description": {
+                                "type": "string",
+                                "example": "Client created successfully"
+                              },
+                              "old_data": {
+                                "type": "object",
+                                "nullable": true
+                              },
+                              "new_data": {
+                                "type": "object",
+                                "nullable": true
+                              },
+                              "created_at": {
+                                "type": "string",
+                                "format": "date-time",
+                                "example": "2026-06-03T14:00:00Z"
+                              }
+                            }
+                          }
+                        },
+                        "total": {
+                          "type": "integer",
+                          "example": 150
+                        },
+                        "page": {
+                          "type": "integer",
+                          "example": 1
+                        },
+                        "limit": {
+                          "type": "integer",
+                          "example": 10
+                        },
+                        "total_pages": {
+                          "type": "integer",
+                          "example": 15
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Non authentifié"
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      }
+    },
+    "/api/airlines": {
+      "post": {
+        "summary": "Créer une compagnie aérienne",
+        "description": "Crée une nouvelle compagnie aérienne.",
+        "tags": [
+          "Airlines"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "code",
+                  "name",
+                  "country"
+                ],
+                "properties": {
+                  "code": {
+                    "type": "string",
+                    "example": "ET",
+                    "description": "Code IATA ou code interne de la compagnie"
+                  },
+                  "name": {
+                    "type": "string",
+                    "example": "Ethiopian Airlines"
+                  },
+                  "country": {
+                    "type": "string",
+                    "example": "Ethiopia"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Compagnie créée avec succès"
+          },
+          "400": {
+            "description": "Code compagnie déjà existant ou données invalides"
+          },
+          "401": {
+            "description": "Non authentifié"
+          },
+          "403": {
+            "description": "Réservé aux administrateurs"
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      },
+      "get": {
+        "summary": "Liste des compagnies aériennes",
+        "description": "Retourne la liste de toutes les compagnies aériennes actives.",
+        "tags": [
+          "Airlines"
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste récupérée avec succès",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Airlines retrieved successfully"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "code": {
+                            "type": "string",
+                            "example": "ET"
+                          },
+                          "name": {
+                            "type": "string",
+                            "example": "Ethiopian Airlines"
+                          },
+                          "logo": {
+                            "type": "string",
+                            "nullable": true,
+                            "example": null
+                          },
+                          "country": {
+                            "type": "string",
+                            "example": "Ethiopia"
+                          },
+                          "is_active": {
+                            "type": "boolean",
+                            "example": true
+                          },
+                          "created_at": {
+                            "type": "string",
+                            "format": "date-time",
+                            "example": "2026-05-20T13:13:57.777Z"
+                          },
+                          "updated_at": {
+                            "type": "string",
+                            "format": "date-time",
+                            "example": "2026-05-20T13:13:57.777Z"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Non authentifié"
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      }
+    },
+    "/api/airlines/{id}": {
+      "put": {
+        "summary": "Modifier une compagnie aérienne",
+        "description": "Met à jour les informations d'une compagnie aérienne.",
+        "tags": [
+          "Airlines"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Identifiant de la compagnie aérienne"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "code": {
+                    "type": "string",
+                    "example": "ET"
+                  },
+                  "name": {
+                    "type": "string",
+                    "example": "Ethiopian Airlines"
+                  },
+                  "country": {
+                    "type": "string",
+                    "example": "Ethiopia"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Compagnie modifiée avec succès"
+          },
+          "400": {
+            "description": "Données invalides"
+          },
+          "401": {
+            "description": "Non authentifié"
+          },
+          "403": {
+            "description": "Réservé aux administrateurs"
+          },
+          "404": {
+            "description": "Compagnie introuvable"
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Supprimer une compagnie aérienne",
+        "description": "Effectue une suppression logique d'une compagnie aérienne.",
+        "tags": [
+          "Airlines"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Identifiant de la compagnie aérienne"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Compagnie supprimée avec succès"
+          },
+          "401": {
+            "description": "Non authentifié"
+          },
+          "403": {
+            "description": "Réservé aux administrateurs"
+          },
+          "404": {
+            "description": "Compagnie introuvable"
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Users",
+      "description": "Gestion des utilisateurs"
+    },
+    {
+      "name": "Ticket Adjustments",
+      "description": "Gestion des modifications, remboursements et ajustements de billets"
+    },
+    {
+      "name": "Systems",
+      "description": "Gestion des systèmes de réservation et plateformes partenaires"
+    },
+    {
+      "name": "Stocks",
+      "description": "Gestion des stocks de billets associés aux contrats partenaires"
+    },
+    {
+      "name": "Services",
+      "description": "Gestion des services proposés par l'agence"
+    },
+    {
+      "name": "Service Requests",
+      "description": "Gestion des demandes de services clients"
+    },
+    {
+      "name": "Service Request Items",
+      "description": "Gestion des éléments associés aux demandes de services (billets, réservations, prestations)"
+    },
+    {
+      "name": "Partners",
+      "description": "Gestion des partenaires commerciaux et compagnies partenaires"
+    },
+    {
+      "name": "Financial Ledger",
+      "description": "Consultation des écritures comptables et mouvements financiers"
+    },
+    {
+      "name": "Financial Consistency",
+      "description": "Outils d'audit et de contrôle de cohérence financière"
+    },
+    {
+      "name": "Dashboard",
+      "description": "Statistiques, indicateurs financiers et tableaux de bord"
+    },
+    {
+      "name": "Customer Payments",
+      "description": "Gestion des paiements et remboursements clients"
+    },
+    {
+      "name": "Contracts",
+      "description": "Gestion des contrats partenaires"
+    },
+    {
+      "name": "Clients",
+      "description": "Gestion des clients particuliers et entreprises"
+    },
+    {
+      "name": "Cautions",
+      "description": "Gestion des cautions liées aux contrats partenaires"
+    },
+    {
+      "name": "Authentication",
+      "description": "Authentification et gestion de session utilisateur"
+    },
+    {
+      "name": "Audit Logs",
+      "description": "Consultation des journaux d'audit et des actions effectuées dans le système"
+    },
+    {
+      "name": "Airlines",
+      "description": "Gestion des compagnies aériennes"
+    }
+  ]
+}

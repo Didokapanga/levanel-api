@@ -116,7 +116,7 @@ export class FinancialConsistencyService {
 
       FROM service_requests
 
-      WHERE remaining_balance < 0
+      WHERE (total_amount - amount_paid) < 0
 
       AND is_deleted = false
     `;
@@ -141,7 +141,7 @@ export class FinancialConsistencyService {
 
       WHERE status = 'completed'
 
-      AND remaining_balance > 0
+      AND (total_amount - amount_paid) > 0
 
       AND is_deleted = false
     `;
@@ -165,8 +165,8 @@ export class FinancialConsistencyService {
       FROM service_requests
 
       WHERE status = 'pending'
-
-      AND remaining_balance <= 0
+      
+      AND (total_amount - amount_paid) <= 0
 
       AND is_deleted = false
     `;

@@ -9,13 +9,17 @@ const options: swaggerJsdoc.Options = {
       title: 'Levannel API',
       version: '1.0.0',
       description:
-        'API de gestion d’agence de voyage',
+        'API REST de gestion d’agence de voyage développée avec Node.js, Express, TypeScript et PostgreSQL.',
     },
 
     servers: [
       {
         url: 'http://localhost:5000',
         description: 'Development Server',
+      },
+      {
+        url: 'https://levanel-api.onrender.com',
+        description: 'Production Server',
       },
     ],
 
@@ -28,10 +32,17 @@ const options: swaggerJsdoc.Options = {
         },
       },
     },
+
+    security: [
+      {
+        bearerAuth: [],
+      },
+    ],
   },
 
   apis: [
     './src/routes/*.ts',
+    './dist/routes/*.js',
   ],
 };
 
