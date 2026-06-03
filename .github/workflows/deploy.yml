@@ -23,3 +23,15 @@ jobs:
 
       - name: Build
         run: npm run build
+
+  docker:
+    runs-on: ubuntu-latest
+
+    needs: build
+
+    steps:
+      - name: Télécharger le code
+        uses: actions/checkout@v4
+
+      - name: Construire l'image Docker
+        run: docker build -t levannel-api .
