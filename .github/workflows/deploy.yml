@@ -17,18 +17,13 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: npm
 
       - name: Installer dépendances
-        run: npm install
+        run: npm ci
 
       - name: Build
         run: npm run build
-
-      - name: Upload dist
-        uses: actions/upload-artifact@v4
-        with:
-          name: dist-files
-          path: dist
 
   docker:
     runs-on: ubuntu-latest
@@ -39,14 +34,60 @@ jobs:
       - name: Télécharger le code
         uses: actions/checkout@v4
 
-      - name: Download dist
-        uses: actions/download-artifact@v4
-        with:
-          name: dist-files
-          path: downloaded-dist
-
-      - name: Lister les fichiers téléchargés
-        run: ls -R downloaded-dist
-
       - name: Construire l'image Docker
         run: docker build -t levannel-api .
+
+# APPRENTISSAGE DE ARTIFACTS
+
+# name: Levannel API CI
+
+# on:
+#   push:
+#     branches:
+#       - main
+
+# jobs:
+#   build:
+#     runs-on: ubuntu-latest
+
+#     steps:
+#       - name: Télécharger le code
+#         uses: actions/checkout@v4
+
+#       - name: Installer Node
+#         uses: actions/setup-node@v4
+#         with:
+#           node-version: 22
+
+#       - name: Installer dépendances
+#         run: npm install
+
+#       - name: Build
+#         run: npm run build
+
+#       - name: Upload dist
+#         uses: actions/upload-artifact@v4
+#         with:
+#           name: dist-files
+#           path: dist
+
+#   docker:
+#     runs-on: ubuntu-latest
+
+#     needs: build
+
+#     steps:
+#       - name: Télécharger le code
+#         uses: actions/checkout@v4
+
+#       - name: Download dist
+#         uses: actions/download-artifact@v4
+#         with:
+#           name: dist-files
+#           path: downloaded-dist
+
+#       - name: Lister les fichiers téléchargés
+#         run: ls -R downloaded-dist
+
+#       - name: Construire l'image Docker
+#         run: docker build -t levannel-api .
