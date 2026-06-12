@@ -1,3 +1,4 @@
+import { PoolClient } from 'pg';
 import { db }
 from '../database/connection';
 
@@ -13,8 +14,12 @@ extends BaseRepository {
 
   async create(
     data: any,
-    actorId: string
+    actorId: string,
+    client?: PoolClient
   ) {
+
+    const executor =
+      client || db;
 
     const query = `
 
@@ -68,7 +73,7 @@ extends BaseRepository {
     ];
 
     const result =
-      await db.query(
+      await executor.query(
         query,
         values
       );
@@ -77,8 +82,12 @@ extends BaseRepository {
   }
 
   async recalculateAmountPaid(
-    requestId: string
+    requestId: string,
+    client?: PoolClient
   ) {
+
+    const executor =
+      client || db;
 
     const query = `
 
@@ -86,56 +95,49 @@ extends BaseRepository {
 
       SET
 
-        amount_paid = sub.total_paid,
+        amount_paid = COALESCE(
+
+          (
+
+            SELECT
+
+              SUM(
+
+                CASE
+
+                  WHEN payment_type = 'payment'
+                  THEN amount
+
+                  WHEN payment_type = 'refund'
+                  THEN -amount
+
+                  WHEN payment_type = 'adjustment'
+                  THEN amount
+
+                  ELSE 0
+
+                END
+
+              )
+
+            FROM customer_payments
+
+            WHERE request_id = $1
+
+            AND is_deleted = false
+
+          ),
+
+          0
+
+        ),
 
         updated_at = NOW()
 
-      FROM (
-
-        SELECT
-
-          request_id,
-
-          COALESCE(
-
-            SUM(
-
-              CASE
-
-                WHEN payment_type = 'payment'
-                THEN amount
-
-                WHEN payment_type = 'refund'
-                THEN -amount
-
-                WHEN payment_type = 'adjustment'
-                THEN amount
-
-                ELSE 0
-
-              END
-
-            ),
-
-            0
-
-          ) AS total_paid
-
-        FROM customer_payments
-
-        WHERE is_deleted = false
-
-        AND request_id = $1
-
-        GROUP BY request_id
-
-      ) sub
-
-      WHERE service_requests.id =
-        sub.request_id
+      WHERE id = $1
     `;
 
-    await db.query(
+    await executor.query(
       query,
       [requestId]
     );
@@ -283,11 +285,46 @@ extends BaseRepository {
     };
   }
 
+  async findByRequestId(
+    requestId: string,
+    client?: PoolClient
+  ) {
+
+    const executor =
+      client || db;
+
+    const query = `
+
+      SELECT *
+
+      FROM customer_payments
+
+      WHERE request_id = $1
+
+      AND is_deleted = false
+
+      ORDER BY payment_date DESC,
+              created_at DESC
+    `;
+
+    const result =
+      await executor.query(
+        query,
+        [requestId]
+      );
+
+    return result.rows;
+  }
+
   async update(
     id: string,
     data: any,
-    actorId: string
+    actorId: string,
+    client?: PoolClient
   ) {
+
+    const executor =
+      client || db;
 
     const query = `
 
@@ -323,9 +360,15 @@ extends BaseRepository {
           COALESCE(
             $5,
             observation
-          )
+          ),
 
-      WHERE id = $6
+        updated_by = $6,
+
+        updated_at = NOW()
+
+      WHERE id = $7
+
+      AND is_deleted = false
 
       RETURNING *
     `;
@@ -342,11 +385,13 @@ extends BaseRepository {
 
       data.observation,
 
+      actorId,
+
       id,
     ];
 
     const result =
-      await db.query(
+      await executor.query(
         query,
         values
       );

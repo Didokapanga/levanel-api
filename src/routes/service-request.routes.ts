@@ -304,6 +304,36 @@ router.get(
 /**
  * @openapi
  * /api/service-requests/{id}:
+ *   get:
+ *     summary: Détail d'une demande de service
+ *     description: Retourne toutes les informations d'un dossier.
+ *     tags:
+ *       - Service Requests
+ *
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *
+ *     responses:
+ *       200:
+ *         description: Dossier récupéré avec succès
+ *
+ *       404:
+ *         description: Dossier introuvable
+ */
+router.get(
+  '/:id',
+  authMiddleware,
+  controller.getById
+);
+
+/**
+ * @openapi
+ * /api/service-requests/{id}:
  *   put:
  *     summary: Modifier une demande de service
  *     description: Met à jour une demande de service existante.
@@ -407,8 +437,8 @@ router.put(
 
 router.delete(
   '/:id',
-  roleMiddleware('admin', 'manager'),
   authMiddleware,
+  roleMiddleware('admin', 'manager'),
   controller.delete
 );
 

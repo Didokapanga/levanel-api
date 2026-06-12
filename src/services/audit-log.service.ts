@@ -1,3 +1,4 @@
+import { PoolClient } from 'pg';
 import { AuditLogRepository }
 from '../repositories/audit-log.repository';
 
@@ -7,31 +8,35 @@ const repository =
 export class AuditLogService {
 
   async createLog(
-    data: any
+    data: any,
+    client?: PoolClient
   ) {
 
-    return await repository.create({
-      module:
-        data.module,
+    return await repository.create(
+      {
+        module:
+          data.module,
 
-      entity_id:
-        data.entity_id,
+        entity_id:
+          data.entity_id,
 
-      action_type:
-        data.action_type,
+        action_type:
+          data.action_type,
 
-      actor_id:
-        data.actor_id,
+        actor_id:
+          data.actor_id,
 
-      old_data:
-        data.old_data || null,
+        old_data:
+          data.old_data || null,
 
-      new_data:
-        data.new_data || null,
+        new_data:
+          data.new_data || null,
 
-      description:
-        data.description,
-    });
+        description:
+          data.description,
+      },
+      client
+    );
   }
 
   async findAll(

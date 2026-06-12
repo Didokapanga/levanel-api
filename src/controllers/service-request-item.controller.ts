@@ -1,4 +1,4 @@
-import { Response }
+import { Response  }
 from 'express';
 
 import { AuthRequest }
@@ -18,34 +18,76 @@ const service =
 
 export class ServiceRequestItemController {
 
-  create = asyncHandler(
-    async (
-        req: AuthRequest,
-        res: Response
-    ) => {
+    create = asyncHandler(
+        async (
+            req: AuthRequest,
+            res: Response
+        ) => {
 
-        try {
+            try {
 
-        const item =
-            await service.create(
-            req.body,
-            req.user.id
+            const item =
+                await service.create(
+                req.body,
+                req.user.id
+                );
+
+            return successResponse(
+                res,
+                item,
+                'Item created successfully',
+                201
             );
 
-        return successResponse(
+            } catch (error) {
+
+            console.error(error);
+
+            throw error;
+            }
+        }
+    );
+
+    createModification = asyncHandler(
+        async (
+            req: AuthRequest,
+            res: Response
+        ) => {
+
+            const item =
+            await service.createModification(
+                req.body,
+                req.user.id
+            );
+
+            return successResponse(
             res,
             item,
-            'Item created successfully',
+            'Modification created successfully',
             201
-        );
-
-        } catch (error) {
-
-        console.error(error);
-
-        throw error;
+            );
         }
-    }
+    );
+
+    createCancellation = asyncHandler(
+        async (
+            req: AuthRequest,
+            res: Response
+        ) => {
+
+            const item =
+            await service.createCancellation(
+                req.body,
+                req.user.id
+            );
+
+            return successResponse(
+            res,
+            item,
+            'Cancellation created successfully',
+            201
+            );
+        }
     );
 
     update = asyncHandler(
@@ -122,5 +164,24 @@ export class ServiceRequestItemController {
         'Items retrieved successfully'
         );
     }
+    );
+
+    getByRequest = asyncHandler(
+        async (
+            req: AuthRequest,
+            res: Response
+        ) => {
+
+            const items =
+            await service.findByRequestId(
+                req.params.id as string
+            );
+
+            return successResponse(
+            res,
+            items,
+            'Items retrieved successfully'
+            );
+        }
     );
 }

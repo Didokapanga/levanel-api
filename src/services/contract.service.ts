@@ -6,6 +6,7 @@ from '../utils/contract-sanitizer';
 
 import { ApiError }
 from '../utils/api-error';
+import { db } from '../database/connection';
 
 const contractRepository =
   new ContractRepository();
@@ -17,13 +18,42 @@ export class ContractService {
     actorId: string
   ) {
 
-    const contract =
-      await contractRepository.create(
-        data,
-        actorId
+    const client =
+      await db.connect();
+
+    try {
+
+      await client.query(
+        'BEGIN'
       );
 
-    return sanitizeContract(contract);
+      const contract =
+        await contractRepository.create(
+          data,
+          actorId,
+          client
+        );
+
+      await client.query(
+        'COMMIT'
+      );
+
+      return sanitizeContract(
+        contract
+      );
+
+    } catch (error) {
+
+      await client.query(
+        'ROLLBACK'
+      );
+
+      throw error;
+
+    } finally {
+
+      client.release();
+    }
   }
 
   async getContracts(
@@ -58,21 +88,51 @@ export class ContractService {
     actorId: string
   ) {
 
-    const contract =
-      await contractRepository.update(
-        id,
-        data,
-        actorId
+    const client =
+      await db.connect();
+
+    try {
+
+      await client.query(
+        'BEGIN'
       );
 
-    if (!contract) {
-      throw new ApiError(
-        'Contract not found',
-        404
+      const contract =
+        await contractRepository.update(
+          id,
+          data,
+          actorId,
+          client
+        );
+
+      if (!contract) {
+
+        throw new ApiError(
+          'Contract not found',
+          404
+        );
+      }
+
+      await client.query(
+        'COMMIT'
       );
+
+      return sanitizeContract(
+        contract
+      );
+
+    } catch (error) {
+
+      await client.query(
+        'ROLLBACK'
+      );
+
+      throw error;
+
+    } finally {
+
+      client.release();
     }
-
-    return sanitizeContract(contract);
   }
 
   async deleteContract(
@@ -80,9 +140,51 @@ export class ContractService {
     actorId: string
   ) {
 
-    await contractRepository.softDelete(
-      id,
-      actorId
-    );
+    const client =
+      await db.connect();
+
+    try {
+
+      await client.query(
+        'BEGIN'
+      );
+
+      const contract =
+        await contractRepository.findById(
+          id,
+          client
+        );
+
+      if (!contract) {
+
+        throw new ApiError(
+          'Contract not found',
+          404
+        );
+      }
+
+      await contractRepository
+        .softDelete(
+          id,
+          actorId,
+          client
+        );
+
+      await client.query(
+        'COMMIT'
+      );
+
+    } catch (error) {
+
+      await client.query(
+        'ROLLBACK'
+      );
+
+      throw error;
+
+    } finally {
+
+      client.release();
+    }
   }
 }

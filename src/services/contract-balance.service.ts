@@ -6,6 +6,7 @@ from './audit-log.service';
 
 import { ApiError }
 from '../utils/api-error';
+import { PoolClient } from 'pg';
 
 const auditLogService =
   new AuditLogService();
@@ -20,11 +21,15 @@ export class ContractBalanceService {
   async consumeBalance(
     contractId: string,
     amount: number,
-    actorId?: string
+    actorId?: string,
+    client?: PoolClient
   ) {
 
+    const executor =
+      client || db;
+
     const contractResult =
-      await db.query(
+      await executor.query(
 
         `
           SELECT *
@@ -64,7 +69,7 @@ export class ContractBalanceService {
     ) {
 
       const cautionResult =
-        await db.query(
+        await executor.query(
 
           `
             SELECT *
@@ -94,6 +99,7 @@ export class ContractBalanceService {
       }
 
       const oldData = {
+
         amount_remaining:
           caution.amount_remaining,
 
@@ -121,7 +127,7 @@ export class ContractBalanceService {
         );
       }
 
-      await db.query(
+      await executor.query(
 
         `
           UPDATE cautions
@@ -181,7 +187,9 @@ export class ContractBalanceService {
 
             description:
               `Caution balance consumed by ${debitAmount}`
-          });
+
+          },
+          client);
       }
     }
 
@@ -196,7 +204,7 @@ export class ContractBalanceService {
     ) {
 
       const stockResult =
-        await db.query(
+        await executor.query(
 
           `
             SELECT *
@@ -226,6 +234,7 @@ export class ContractBalanceService {
       }
 
       const oldData = {
+
         amount_remaining:
           stock.amount_remaining,
 
@@ -253,7 +262,7 @@ export class ContractBalanceService {
         );
       }
 
-      await db.query(
+      await executor.query(
 
         `
           UPDATE stocks
@@ -313,11 +322,12 @@ export class ContractBalanceService {
 
             description:
               `Stock balance consumed by ${debitAmount}`
-          });
+
+          },
+          client);
       }
     }
   }
-
   /*
     Réinjection
     remboursement
@@ -326,11 +336,15 @@ export class ContractBalanceService {
   async restoreBalance(
     contractId: string,
     amount: number,
-    actorId?: string
+    actorId?: string,
+    client?: PoolClient
   ) {
 
+    const executor =
+      client || db;
+
     const contractResult =
-      await db.query(
+      await executor.query(
 
         `
           SELECT *
@@ -369,7 +383,7 @@ export class ContractBalanceService {
     ) {
 
       const cautionResult =
-        await db.query(
+        await executor.query(
 
           `
             SELECT *
@@ -398,6 +412,7 @@ export class ContractBalanceService {
       }
 
       const oldData = {
+
         amount_remaining:
           caution.amount_remaining,
 
@@ -415,7 +430,7 @@ export class ContractBalanceService {
 
         restoreAmount;
 
-      await db.query(
+      await executor.query(
 
         `
           UPDATE cautions
@@ -471,7 +486,9 @@ export class ContractBalanceService {
 
             description:
               `Caution balance restored by ${restoreAmount}`
-          });
+
+          },
+          client);
       }
     }
 
@@ -485,7 +502,7 @@ export class ContractBalanceService {
     ) {
 
       const stockResult =
-        await db.query(
+        await executor.query(
 
           `
             SELECT *
@@ -514,6 +531,7 @@ export class ContractBalanceService {
       }
 
       const oldData = {
+
         amount_remaining:
           stock.amount_remaining,
 
@@ -531,7 +549,7 @@ export class ContractBalanceService {
 
         restoreAmount;
 
-      await db.query(
+      await executor.query(
 
         `
           UPDATE stocks
@@ -587,7 +605,9 @@ export class ContractBalanceService {
 
             description:
               `Stock balance restored by ${restoreAmount}`
-          });
+
+          },
+          client);
       }
     }
   }

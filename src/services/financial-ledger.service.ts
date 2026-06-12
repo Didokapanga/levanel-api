@@ -9,6 +9,7 @@ from '../utils/financial-ledger-sanitizer';
 
 import { generateLedgerReference }
 from '../utils/generate-ledger-reference';
+import { PoolClient } from 'pg';
 
 const repository =
   new FinancialLedgerRepository();
@@ -20,7 +21,8 @@ export class FinancialLedgerService {
 
   async createEntry(
     data: any,
-    actorId: string
+    actorId: string,
+    client?: PoolClient
   ) {
 
     data.ledger_reference =
@@ -35,7 +37,8 @@ export class FinancialLedgerService {
     const entry =
       await repository.create(
         data,
-        actorId
+        actorId,
+        client
       );
 
     /*
@@ -65,7 +68,10 @@ export class FinancialLedgerService {
 
         description:
           `Ledger entry ${entry.ledger_reference} created`
-      });
+
+      },
+      client
+    );
 
     return entry;
   }

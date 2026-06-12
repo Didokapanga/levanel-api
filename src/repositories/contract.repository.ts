@@ -1,4 +1,6 @@
-import { db } from '../database/connection';
+import { PoolClient } from 'pg';
+import { db }
+from '../database/connection';
 
 import { BaseRepository }
 from './base.repository';
@@ -12,8 +14,12 @@ export class ContractRepository
 
   async create(
     data: any,
-    actorId: string
+    actorId: string,
+    client?: PoolClient
   ) {
+
+    const executor =
+      client || db;
 
     const query = `
       INSERT INTO contracts (
@@ -42,10 +48,11 @@ export class ContractRepository
       actorId,
     ];
 
-    const result = await db.query(
-      query,
-      values
-    );
+    const result =
+      await executor.query(
+        query,
+        values
+      );
 
     return result.rows[0];
   }
@@ -53,11 +60,16 @@ export class ContractRepository
   async update(
     id: string,
     data: any,
-    actorId: string
+    actorId: string,
+    client?: PoolClient
   ) {
+
+    const executor =
+      client || db;
 
     const query = `
       UPDATE contracts
+
       SET
 
         partner_id =
@@ -81,9 +93,13 @@ export class ContractRepository
         is_active =
           COALESCE($7, is_active),
 
-        updated_by = $8
+        updated_by = $8,
+
+        updated_at = NOW()
 
       WHERE id = $9
+
+      AND is_deleted = false
 
       RETURNING *
     `;
@@ -100,10 +116,11 @@ export class ContractRepository
       id,
     ];
 
-    const result = await db.query(
-      query,
-      values
-    );
+    const result =
+      await executor.query(
+        query,
+        values
+      );
 
     return result.rows[0];
   }
@@ -210,7 +227,10 @@ export class ContractRepository
     `;
 
     const result =
-      await db.query(query, values);
+      await db.query(
+        query,
+        values
+      );
 
     const countResult =
       await db.query(
@@ -229,8 +249,9 @@ export class ContractRepository
       page,
       limit,
       total_pages: Math.ceil(
-        Number(countResult.rows[0].total)
-        / limit
+        Number(
+          countResult.rows[0].total
+        ) / limit
       ),
     };
   }

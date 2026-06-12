@@ -1,3 +1,4 @@
+import { PoolClient } from 'pg';
 import { db }
 from '../database/connection';
 
@@ -5,8 +6,12 @@ export class FinancialLedgerRepository {
 
   async create(
     data: any,
-    actorId: string
+    actorId: string,
+    client?: PoolClient
   ) {
+
+    const executor =
+      client || db;
 
     const query = `
 
@@ -94,7 +99,7 @@ export class FinancialLedgerRepository {
     ];
 
     const result =
-      await db.query(
+      await executor.query(
         query,
         values
       );

@@ -75,6 +75,25 @@ export class CustomerPaymentController {
     }
   );
 
+  getByRequest = asyncHandler(
+  async (
+    req: AuthRequest,
+    res: Response
+  ) => {
+
+    const payments =
+      await service.findByRequestId(
+        req.params.id as string
+      );
+
+    return successResponse(
+      res,
+      payments,
+      'Payments retrieved successfully'
+    );
+  }
+);
+
   update = asyncHandler(
     async (
       req: AuthRequest,

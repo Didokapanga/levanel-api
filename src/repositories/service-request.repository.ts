@@ -1,3 +1,4 @@
+import { PoolClient } from 'pg';
 import { db }
 from '../database/connection';
 
@@ -13,8 +14,12 @@ extends BaseRepository {
 
   async create(
     data: any,
-    actorId: string
+    actorId: string,
+    client?: PoolClient
   ) {
+
+    const executor =
+      client || db;
 
     const query = `
       INSERT INTO service_requests (
@@ -69,7 +74,7 @@ extends BaseRepository {
     ];
 
     const result =
-      await db.query(
+      await executor.query(
         query,
         values
       );
@@ -80,8 +85,12 @@ extends BaseRepository {
   async update(
     id: string,
     data: any,
-    actorId: string
+    actorId: string,
+    client?: PoolClient
   ) {
+
+    const executor =
+      client || db;
 
     const query = `
       UPDATE service_requests
@@ -123,7 +132,7 @@ extends BaseRepository {
     ];
 
     const result =
-      await db.query(
+      await executor.query(
         query,
         values
       );
@@ -283,9 +292,63 @@ extends BaseRepository {
     };
   }
 
+  async findRequestById(
+  id: string,
+  client?: PoolClient
+) {
+
+  const executor =
+    client || db;
+  
+  const query = `
+
+    SELECT
+
+      sr.*,
+
+      clients.name
+      AS client_name,
+
+      services.name
+      AS service_name,
+
+      partners.name
+      AS partner_name
+
+    FROM service_requests sr
+
+    INNER JOIN clients
+    ON clients.id = sr.client_id
+
+    INNER JOIN services
+    ON services.id = sr.service_id
+
+    LEFT JOIN partners
+    ON partners.id = sr.partner_id
+
+    WHERE sr.id = $1
+
+    AND sr.is_deleted = false
+
+    LIMIT 1
+  `;
+
+  const result =
+    await executor.query(
+      query,
+      [id]
+    );
+
+  return result.rows[0];
+}
+
   async updateFinancialTotals(
-    requestId: string
+    requestId: string,
+    client?: PoolClient
   ) {
+
+    const executor =
+      client || db;
 
     const query = `
 
@@ -354,15 +417,19 @@ extends BaseRepository {
         sub.request_id
     `;
 
-    await db.query(
+    await executor.query(
       query,
       [requestId]
     );
   }
 
   async updateRequestStatus(
-    requestId: string
+    requestId: string,
+    client?: PoolClient
   ) {
+
+    const executor =
+      client || db;
 
     const query = `
 
@@ -372,14 +439,33 @@ extends BaseRepository {
 
         status = CASE
 
-          WHEN total_amount <= 0 THEN
-            'pending'
+          /*
+            Aucun item
+          */
 
-          WHEN remaining_amount <= 0 THEN
-            'completed'
+          WHEN total_amount <= 0
+          THEN 'pending'
 
-          ELSE
-            'confirmed'
+          /*
+            Aucun paiement
+          */
+
+          WHEN amount_paid <= 0
+          THEN 'pending'
+
+          /*
+            Paiement total
+          */
+
+          WHEN amount_paid >= total_amount
+            AND total_amount > 0
+          THEN 'completed'
+
+          /*
+            Paiement partiel
+          */
+
+          ELSE 'confirmed'
 
         END,
 
@@ -392,5 +478,69 @@ extends BaseRepository {
       query,
       [requestId]
     );
+  }
+
+  async markBalanceConsumed(
+    requestId: string,
+    client?: PoolClient
+  ) {
+
+    const executor =
+      client || db;
+
+    const query = `
+
+      UPDATE service_requests
+
+      SET
+
+        balance_consumed = true,
+
+        updated_at = NOW()
+
+      WHERE id = $1
+
+      RETURNING *
+    `;
+
+    const result =
+      await executor.query(
+        query,
+        [requestId]
+      );
+
+    return result.rows[0];
+  }
+
+  async resetBalanceConsumed(
+    requestId: string,
+    client?: PoolClient
+  ) {
+
+    const executor =
+      client || db;
+
+    const query = `
+
+      UPDATE service_requests
+
+      SET
+
+        balance_consumed = false,
+
+        updated_at = NOW()
+
+      WHERE id = $1
+
+      RETURNING *
+    `;
+
+    const result =
+      await executor.query(
+        query,
+        [requestId]
+      );
+
+    return result.rows[0];
   }
 }

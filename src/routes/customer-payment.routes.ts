@@ -50,7 +50,6 @@ const controller =
  *               - payment_method
  *               - payment_type
  *               - amount
- *               - currency
  *
  *             properties:
  *
@@ -65,11 +64,14 @@ const controller =
  *
  *               payment_type:
  *                 type: string
+ *                 enum:
+ *                   - payment
+ *                   - refund
  *                 example: payment
- *                 description: payment ou refund
  *
  *               amount:
  *                 type: number
+ *                 minimum: 0.01
  *                 example: 500
  *
  *               currency:
@@ -81,17 +83,54 @@ const controller =
  *                 example: Premier acompte
  *
  *     responses:
+ *
  *       201:
  *         description: Paiement enregistré avec succès
  *
  *       400:
- *         description: Données invalides
+ *         description: Violation d'une règle métier
+ *         content:
+ *           application/json:
+ *             examples:
+ *
+ *               already_paid:
+ *                 summary: Dossier déjà soldé
+ *                 value:
+ *                   success: false
+ *                   message: Request is already fully paid
+ *
+ *               payment_too_large:
+ *                 summary: Paiement supérieur au reste à payer
+ *                 value:
+ *                   success: false
+ *                   message: Maximum allowed payment is 500
+ *
+ *               refund_too_large:
+ *                 summary: Remboursement supérieur au montant payé
+ *                 value:
+ *                   success: false
+ *                   message: Maximum refundable amount is 1000
+ *
+ *               cancelled_request:
+ *                 summary: Dossier annulé
+ *                 value:
+ *                   success: false
+ *                   message: Payments cannot be added to a cancelled request
+ *
+ *               invalid_amount:
+ *                 summary: Montant invalide
+ *                 value:
+ *                   success: false
+ *                   message: Payment amount must be greater than zero
  *
  *       401:
  *         description: Non authentifié
  *
  *       403:
  *         description: Accès refusé
+ *
+ *       404:
+ *         description: Dossier introuvable
  *
  *       500:
  *         description: Erreur serveur
@@ -243,7 +282,43 @@ router.post(
 router.get(
   '/',
   authMiddleware,
+  roleMiddleware('admin', 'manager', 'agent'),
   controller.findAll
+);
+
+/**
+ * @openapi
+ * /api/customer-payments/request/{id}:
+ *   get:
+ *     summary: Liste des paiements d'une demande de service
+ *     description: Retourne tous les paiements associés à un dossier spécifique.
+ *     tags:
+ *       - Customer Payments
+ *
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         description: Identifiant de la demande de service
+ *
+ *     responses:
+ *       200:
+ *         description: Paiements récupérés avec succès
+ *
+ *       401:
+ *         description: Non authentifié
+ *
+ *       404:
+ *         description: Dossier introuvable
+ */
+router.get(
+  '/request/:id',
+  authMiddleware,
+  roleMiddleware('admin', 'manager', 'agent'),
+  controller.getByRequest
 );
 
 /**
@@ -251,7 +326,7 @@ router.get(
  * /api/customer-payments/{id}:
  *   put:
  *     summary: Modifier un paiement client
- *     description: Met à jour les informations d'un paiement ou remboursement.
+ *     description: Met à jour un paiement client existant. Les remboursements ne peuvent pas être modifiés. Les paiements d'un dossier annulé ou entièrement soldé ne peuvent pas être modifiés.
  *     tags:
  *       - Customer Payments
  *
@@ -279,18 +354,57 @@ router.get(
  *
  *               amount:
  *                 type: number
+ *                 minimum: 0.01
  *                 example: 750
+ *
+ *               currency:
+ *                 type: string
+ *                 example: USD
  *
  *               observation:
  *                 type: string
  *                 example: Paiement corrigé après rapprochement bancaire
  *
  *     responses:
+ *
  *       200:
  *         description: Paiement modifié avec succès
  *
  *       400:
- *         description: Données invalides
+ *         description: Violation d'une règle métier
+ *         content:
+ *           application/json:
+ *             examples:
+ *
+ *               completed_request:
+ *                 summary: Dossier soldé
+ *                 value:
+ *                   success: false
+ *                   message: Payments of completed requests cannot be modified
+ *
+ *               cancelled_request:
+ *                 summary: Dossier annulé
+ *                 value:
+ *                   success: false
+ *                   message: Payments of cancelled requests cannot be modified
+ *
+ *               refund_payment:
+ *                 summary: Paiement de type remboursement
+ *                 value:
+ *                   success: false
+ *                   message: Refund payments cannot be modified
+ *
+ *               invalid_amount:
+ *                 summary: Montant invalide
+ *                 value:
+ *                   success: false
+ *                   message: Payment amount must be greater than zero
+ *
+ *               exceeded_amount:
+ *                 summary: Dépassement du montant autorisé
+ *                 value:
+ *                   success: false
+ *                   message: Maximum allowed amount is 500
  *
  *       401:
  *         description: Non authentifié
@@ -299,7 +413,7 @@ router.get(
  *         description: Accès refusé
  *
  *       404:
- *         description: Paiement introuvable
+ *         description: Paiement ou dossier introuvable
  *
  *       500:
  *         description: Erreur serveur
@@ -320,7 +434,7 @@ router.put(
  * /api/customer-payments/{id}:
  *   delete:
  *     summary: Supprimer un paiement client
- *     description: Effectue une suppression logique d'un paiement ou remboursement.
+ *     description: Effectue une suppression logique d'un paiement client. Les remboursements, les paiements d'un dossier annulé ou d'un dossier soldé ne peuvent pas être supprimés.
  *     tags:
  *       - Customer Payments
  *
@@ -334,8 +448,33 @@ router.put(
  *         description: Identifiant du paiement
  *
  *     responses:
+ *
  *       200:
  *         description: Paiement supprimé avec succès
+ *
+ *       400:
+ *         description: Violation d'une règle métier
+ *         content:
+ *           application/json:
+ *             examples:
+ *
+ *               completed_request:
+ *                 summary: Dossier soldé
+ *                 value:
+ *                   success: false
+ *                   message: Payments of completed requests cannot be deleted
+ *
+ *               cancelled_request:
+ *                 summary: Dossier annulé
+ *                 value:
+ *                   success: false
+ *                   message: Payments of cancelled requests cannot be deleted
+ *
+ *               refund_payment:
+ *                 summary: Paiement de type remboursement
+ *                 value:
+ *                   success: false
+ *                   message: Refund payments cannot be deleted
  *
  *       401:
  *         description: Non authentifié
@@ -344,7 +483,7 @@ router.put(
  *         description: Accès refusé
  *
  *       404:
- *         description: Paiement introuvable
+ *         description: Paiement ou dossier introuvable
  *
  *       500:
  *         description: Erreur serveur

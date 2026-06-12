@@ -1,11 +1,16 @@
+import { PoolClient } from 'pg';
 import { db }
 from '../database/connection';
 
 export class AuditLogRepository {
 
   async create(
-    data: any
+    data: any,
+    client?: PoolClient
   ) {
+
+    const executor =
+      client || db;
 
     const query = `
 
@@ -56,7 +61,7 @@ export class AuditLogRepository {
     ];
 
     const result =
-      await db.query(
+      await executor.query(
         query,
         values
       );

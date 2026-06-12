@@ -1,3 +1,4 @@
+import { PoolClient } from 'pg';
 import { db } from '../database/connection';
 
 import { BaseRepository }
@@ -12,8 +13,12 @@ export class StockRepository
 
   async create(
     data: any,
-    actorId: string
+    actorId: string,
+    client?: PoolClient
   ) {
+
+    const executor =
+      client || db;
 
     const query = `
       INSERT INTO stocks (
@@ -42,6 +47,7 @@ export class StockRepository
     `;
 
     const values = [
+
       data.contract_id,
 
       data.amount_initial,
@@ -58,7 +64,7 @@ export class StockRepository
     ];
 
     const result =
-      await db.query(
+      await executor.query(
         query,
         values
       );
@@ -69,8 +75,12 @@ export class StockRepository
   async update(
     id: string,
     data: any,
-    actorId: string
+    actorId: string,
+    client?: PoolClient
   ) {
+
+    const executor =
+      client || db;
 
     const query = `
       UPDATE stocks
@@ -95,23 +105,32 @@ export class StockRepository
             is_active
           ),
 
-        updated_by = $4
+        updated_by = $4,
+
+        updated_at = NOW()
 
       WHERE id = $5
+
+      AND is_deleted = false
 
       RETURNING *
     `;
 
     const values = [
+
       data.amount_remaining,
+
       data.notes,
+
       data.is_active,
+
       actorId,
+
       id,
     ];
 
     const result =
-      await db.query(
+      await executor.query(
         query,
         values
       );
@@ -250,22 +269,29 @@ export class StockRepository
   }
 
   async findById(
-    id: string
-    ) {
+    id: string,
+    client?: PoolClient
+  ) {
+
+    const executor =
+      client || db;
 
     const query = `
-        SELECT *
-        FROM contracts
-        WHERE id = $1
-        LIMIT 1
+      SELECT *
+
+      FROM contracts
+
+      WHERE id = $1
+
+      LIMIT 1
     `;
 
     const result =
-        await db.query(
+      await executor.query(
         query,
         [id]
-        );
+      );
 
     return result.rows[0];
-    }
+  }
 }

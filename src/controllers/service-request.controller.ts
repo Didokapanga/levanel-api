@@ -80,6 +80,25 @@ export class ServiceRequestController {
     }
   );
 
+  getById = asyncHandler(
+    async (
+      req: AuthRequest,
+      res: Response
+    ) => {
+
+      const request =
+        await service.findById(
+          req.params.id as string
+        );
+
+      return successResponse(
+        res,
+        request,
+        'Request retrieved successfully'
+      );
+    }
+  );
+
   update = asyncHandler(
     async (
       req: AuthRequest,

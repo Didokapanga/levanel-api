@@ -19,6 +19,9 @@ export const sanitizeServiceRequestItem =
     item_status:
       item.item_status,
 
+    parent_item_id:
+      item.parent_item_id,
+
     customer_name:
       item.customer_name,
 
@@ -66,6 +69,12 @@ export const sanitizeServiceRequestItem =
 
     commission_amount:
       item.commission_amount,
+
+    airline_penalty:
+      item.airline_penalty,
+
+    refund_amount:
+      item.refund_amount,
 
     ttc_amount:
       item.ttc_amount,

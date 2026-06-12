@@ -1,3 +1,4 @@
+import { PoolClient } from 'pg';
 import { db } from '../database/connection';
 
 import { BaseRepository }
@@ -12,8 +13,12 @@ export class CautionRepository
 
   async create(
     data: any,
-    actorId: string
+    actorId: string,
+    client?: PoolClient
   ) {
+
+    const executor =
+      client || db;
 
     const query = `
       INSERT INTO cautions (
@@ -42,6 +47,7 @@ export class CautionRepository
     `;
 
     const values = [
+
       data.contract_id,
 
       data.amount_initial,
@@ -58,7 +64,7 @@ export class CautionRepository
     ];
 
     const result =
-      await db.query(
+      await executor.query(
         query,
         values
       );
@@ -69,8 +75,12 @@ export class CautionRepository
   async update(
     id: string,
     data: any,
-    actorId: string
+    actorId: string,
+    client?: PoolClient
   ) {
+
+    const executor =
+      client || db;
 
     const query = `
       UPDATE cautions
@@ -95,23 +105,32 @@ export class CautionRepository
             is_active
           ),
 
-        updated_by = $4
+        updated_by = $4,
+
+        updated_at = NOW()
 
       WHERE id = $5
+
+      AND is_deleted = false
 
       RETURNING *
     `;
 
     const values = [
+
       data.amount_remaining,
+
       data.notes,
+
       data.is_active,
+
       actorId,
+
       id,
     ];
 
     const result =
-      await db.query(
+      await executor.query(
         query,
         values
       );

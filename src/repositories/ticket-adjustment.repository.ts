@@ -1,3 +1,4 @@
+import { PoolClient } from 'pg';
 import { db }
 from '../database/connection';
 
@@ -15,8 +16,12 @@ extends BaseRepository {
 
   async create(
     data: any,
-    actorId: string
+    actorId: string,
+    client?: PoolClient
   ) {
+
+    const executor =
+      client || db;
 
     const query = `
 
@@ -75,7 +80,7 @@ extends BaseRepository {
     ];
 
     const result =
-      await db.query(
+      await executor.query(
         query,
         values
       );
@@ -84,8 +89,12 @@ extends BaseRepository {
   }
 
   async findById(
-    id: string
+    id: string,
+    client?: PoolClient
   ) {
+
+    const executor =
+      client || db;
 
     const query = `
 
@@ -100,7 +109,7 @@ extends BaseRepository {
     `;
 
     const result =
-      await db.query(
+      await executor.query(
         query,
         [id]
       );
@@ -111,8 +120,12 @@ extends BaseRepository {
   async update(
     id: string,
     data: any,
-    actorId: string
+    actorId: string,
+    client?: PoolClient
   ) {
+
+    const executor =
+      client || db;
 
     const query = `
 
@@ -177,7 +190,7 @@ extends BaseRepository {
     ];
 
     const result =
-      await db.query(
+      await executor.query(
         query,
         values
       );
@@ -187,8 +200,12 @@ extends BaseRepository {
 
   async softDelete(
     id: string,
-    actorId: string
+    actorId: string,
+    client?: PoolClient
   ) {
+
+    const executor =
+      client || db;
 
     const query = `
 
@@ -205,7 +222,7 @@ extends BaseRepository {
       WHERE id = $2
     `;
 
-    await db.query(
+    await executor.query(
       query,
       [
         actorId,

@@ -6,8 +6,17 @@ export const createServiceRequestItemSchema =
     request_id: z
       .uuid(),
 
-    item_type: z
-      .string(),
+    item_type:
+      z.enum([
+        'ticket',
+        'modification',
+        'cancellation',
+        'service'
+      ]),
+
+    parent_item_id:
+      z.uuid()
+        .optional(),
 
     customer_name: z
       .string()
@@ -73,6 +82,14 @@ export const createServiceRequestItemSchema =
       .number()
       .default(0),
 
+    airline_penalty:
+      z.number()
+        .default(0),
+
+    refund_amount:
+      z.number()
+        .default(0),
+
     notes: z
       .string()
       .optional(),
@@ -82,19 +99,32 @@ export const updateServiceRequestItemSchema =
   z.object({
 
     customer_name:
-      z.string().optional(),
+      z.string()
+        .optional(),
 
     route:
-      z.string().optional(),
+      z.string()
+        .optional(),
 
     travel_class:
-      z.string().optional(),
+      z.string()
+        .optional(),
 
     departure_date:
-      z.string().optional(),
+      z.string()
+        .optional(),
 
     notes:
-      z.string().optional(),
+      z.string()
+        .optional(),
+
+    item_status:
+      z.enum([
+        'draft',
+        'issued',
+        'completed',
+        'cancelled',
+        'refunded'
+      ])
+      .optional(),
   });
-// export const updateServiceRequestItemSchema =
-//   createServiceRequestItemSchema.partial();

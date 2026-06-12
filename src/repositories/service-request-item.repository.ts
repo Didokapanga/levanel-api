@@ -1,3 +1,4 @@
+import { PoolClient } from 'pg';
 import { db }
 from '../database/connection';
 
@@ -15,8 +16,12 @@ extends BaseRepository {
 
   async create(
     data: any,
-    actorId: string
+    actorId: string,
+    client?: PoolClient
   ) {
+
+    const executor =
+      client || db;
 
     const query = `
       INSERT INTO service_request_items (
@@ -26,6 +31,8 @@ extends BaseRepository {
         item_reference,
 
         item_type,
+
+        item_status,
 
         customer_name,
 
@@ -63,6 +70,12 @@ extends BaseRepository {
 
         debit_balance,
 
+        parent_item_id,
+
+        airline_penalty,
+
+        refund_amount,
+
         notes,
 
         created_by
@@ -75,7 +88,8 @@ extends BaseRepository {
         $9, $10, $11, $12,
         $13, $14, $15, $16,
         $17, $18, $19, $20,
-        $21, $22, $23
+        $21, $22, $23, $24,
+        $25, $26, $27
 
       )
 
@@ -89,6 +103,8 @@ extends BaseRepository {
       data.item_reference,
 
       data.item_type,
+
+      data.item_status,
 
       data.customer_name,
 
@@ -126,13 +142,19 @@ extends BaseRepository {
 
       data.debit_balance,
 
+      data.parent_item_id || null,
+
+      data.airline_penalty || 0,
+
+      data.refund_amount || 0,
+
       data.notes,
 
       actorId,
     ];
 
     const result =
-      await db.query(
+      await executor.query(
         query,
         values
       );
@@ -300,11 +322,126 @@ extends BaseRepository {
     };
   }
 
+  async findByRequestId(
+    requestId: string,
+    client?: PoolClient
+  ) {
+
+    const executor =
+      client || db;
+
+    const query = `
+      SELECT
+        sri.*,
+        airlines.name AS airline_name,
+        systems.name AS system_name
+
+      FROM service_request_items sri
+
+      LEFT JOIN airlines
+        ON airlines.id = sri.airline_id
+
+      LEFT JOIN systems
+        ON systems.id = sri.system_id
+
+      WHERE
+        sri.request_id = $1
+        AND sri.is_deleted = false
+
+      ORDER BY sri.created_at DESC
+    `;
+
+    const result =
+      await executor.query(
+        query,
+        [requestId]
+      );
+
+    return result.rows;
+  }
+
+  async findChildren(
+    parentItemId: string,
+    client?: PoolClient
+  ) {
+
+    const executor =
+      client || db;
+
+    const query = `
+
+      SELECT *
+
+      FROM service_request_items
+
+      WHERE parent_item_id = $1
+
+      AND is_deleted = false
+
+      ORDER BY created_at ASC
+    `;
+
+    const result =
+      await executor.query(
+        query,
+        [parentItemId]
+      );
+
+    return result.rows;
+  }
+
+  async updateStatus(
+    id: string,
+    status: string,
+    actorId: string,
+    client?: PoolClient
+  ) {
+
+    const executor =
+      client || db;
+
+    const query = `
+
+      UPDATE service_request_items
+
+      SET
+
+        item_status = $1,
+
+        updated_by = $2,
+
+        updated_at = NOW()
+
+      WHERE id = $3
+
+      AND is_deleted = false
+
+      RETURNING *
+
+    `;
+
+    const result =
+      await executor.query(
+        query,
+        [
+          status,
+          actorId,
+          id
+        ]
+      );
+
+    return result.rows[0];
+  }
+
   async update(
     id: string,
     data: any,
-    actorId: string
+    actorId: string,
+    client?: PoolClient
   ) {
+
+    const executor =
+      client || db;
 
     const query = `
 
@@ -342,13 +479,33 @@ extends BaseRepository {
             notes
           ),
 
-        updated_by = $6,
+        parent_item_id =
+          COALESCE(
+            $6,
+            parent_item_id
+          ),
+
+        airline_penalty =
+          COALESCE(
+            $7,
+            airline_penalty
+          ),
+
+        refund_amount =
+          COALESCE(
+            $8,
+            refund_amount
+          ),
+
+        updated_by = $9,
 
         updated_at = NOW()
 
-      WHERE id = $7
+        WHERE id = $10
 
-      RETURNING *
+        AND is_deleted = false
+
+        RETURNING *
     `;
 
     const values = [
@@ -363,13 +520,19 @@ extends BaseRepository {
 
       data.notes,
 
+      data.parent_item_id,
+
+      data.airline_penalty,
+
+      data.refund_amount,
+
       actorId,
 
       id,
     ];
 
     const result =
-      await db.query(
+      await executor.query(
         query,
         values
       );

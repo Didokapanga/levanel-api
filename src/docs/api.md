@@ -4369,6 +4369,168 @@ To perform this operation, you must be authenticated by means of one of the foll
 bearerAuth
 </aside>
 
+## get__api_service-requests_{id}
+
+> Code samples
+
+```shell
+# You can also use wget
+curl -X GET http://localhost:5000/api/service-requests/{id} \
+  -H 'Authorization: Bearer {access-token}'
+
+```
+
+```http
+GET http://localhost:5000/api/service-requests/{id} HTTP/1.1
+Host: localhost:5000
+
+```
+
+```javascript
+
+const headers = {
+  'Authorization':'Bearer {access-token}'
+};
+
+fetch('http://localhost:5000/api/service-requests/{id}',
+{
+  method: 'GET',
+
+  headers: headers
+})
+.then(function(res) {
+    return res.json();
+}).then(function(body) {
+    console.log(body);
+});
+
+```
+
+```ruby
+require 'rest-client'
+require 'json'
+
+headers = {
+  'Authorization' => 'Bearer {access-token}'
+}
+
+result = RestClient.get 'http://localhost:5000/api/service-requests/{id}',
+  params: {
+  }, headers: headers
+
+p JSON.parse(result)
+
+```
+
+```python
+import requests
+headers = {
+  'Authorization': 'Bearer {access-token}'
+}
+
+r = requests.get('http://localhost:5000/api/service-requests/{id}', headers = headers)
+
+print(r.json())
+
+```
+
+```php
+<?php
+
+require 'vendor/autoload.php';
+
+$headers = array(
+    'Authorization' => 'Bearer {access-token}',
+);
+
+$client = new \GuzzleHttp\Client();
+
+// Define array of request body.
+$request_body = array();
+
+try {
+    $response = $client->request('GET','http://localhost:5000/api/service-requests/{id}', array(
+        'headers' => $headers,
+        'json' => $request_body,
+       )
+    );
+    print_r($response->getBody()->getContents());
+ }
+ catch (\GuzzleHttp\Exception\BadResponseException $e) {
+    // handle exception or api errors.
+    print_r($e->getMessage());
+ }
+
+ // ...
+
+```
+
+```java
+URL obj = new URL("http://localhost:5000/api/service-requests/{id}");
+HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+con.setRequestMethod("GET");
+int responseCode = con.getResponseCode();
+BufferedReader in = new BufferedReader(
+    new InputStreamReader(con.getInputStream()));
+String inputLine;
+StringBuffer response = new StringBuffer();
+while ((inputLine = in.readLine()) != null) {
+    response.append(inputLine);
+}
+in.close();
+System.out.println(response.toString());
+
+```
+
+```go
+package main
+
+import (
+       "bytes"
+       "net/http"
+)
+
+func main() {
+
+    headers := map[string][]string{
+        "Authorization": []string{"Bearer {access-token}"},
+    }
+
+    data := bytes.NewBuffer([]byte{jsonReq})
+    req, err := http.NewRequest("GET", "http://localhost:5000/api/service-requests/{id}", data)
+    req.Header = headers
+
+    client := &http.Client{}
+    resp, err := client.Do(req)
+    // ...
+}
+
+```
+
+`GET /api/service-requests/{id}`
+
+*Détail d'une demande de service*
+
+Retourne toutes les informations d'un dossier.
+
+<h3 id="get__api_service-requests_{id}-parameters">Parameters</h3>
+
+|Name|In|Type|Required|Description|
+|---|---|---|---|---|
+|id|path|string(uuid)|true|none|
+
+<h3 id="get__api_service-requests_{id}-responses">Responses</h3>
+
+|Status|Meaning|Description|Schema|
+|---|---|---|---|
+|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|Dossier récupéré avec succès|None|
+|404|[Not Found](https://tools.ietf.org/html/rfc7231#section-6.5.4)|Dossier introuvable|None|
+
+<aside class="warning">
+To perform this operation, you must be authenticated by means of one of the following methods:
+bearerAuth
+</aside>
+
 ## put__api_service-requests_{id}
 
 > Code samples
@@ -5212,6 +5374,660 @@ Status Code **200**
 |»» page|integer|false|none|none|
 |»» limit|integer|false|none|none|
 |»» total_pages|integer|false|none|none|
+
+<aside class="warning">
+To perform this operation, you must be authenticated by means of one of the following methods:
+bearerAuth
+</aside>
+
+## post__api_service-request-items_modification
+
+> Code samples
+
+```shell
+# You can also use wget
+curl -X POST http://localhost:5000/api/service-request-items/modification \
+  -H 'Content-Type: application/json' \
+  -H 'Authorization: Bearer {access-token}'
+
+```
+
+```http
+POST http://localhost:5000/api/service-request-items/modification HTTP/1.1
+Host: localhost:5000
+Content-Type: application/json
+
+```
+
+```javascript
+const inputBody = '{
+  "parent_item_id": "2d6fc8c5-0b40-4c8a-b8b8-70cfc2e6f845",
+  "modification_fee": 50,
+  "debit_balance": 35,
+  "route": "KIN-BRU",
+  "travel_class": "Business",
+  "departure_date": "2019-08-24T14:15:22Z",
+  "notes": "Changement de date demandé par le client"
+}';
+const headers = {
+  'Content-Type':'application/json',
+  'Authorization':'Bearer {access-token}'
+};
+
+fetch('http://localhost:5000/api/service-request-items/modification',
+{
+  method: 'POST',
+  body: inputBody,
+  headers: headers
+})
+.then(function(res) {
+    return res.json();
+}).then(function(body) {
+    console.log(body);
+});
+
+```
+
+```ruby
+require 'rest-client'
+require 'json'
+
+headers = {
+  'Content-Type' => 'application/json',
+  'Authorization' => 'Bearer {access-token}'
+}
+
+result = RestClient.post 'http://localhost:5000/api/service-request-items/modification',
+  params: {
+  }, headers: headers
+
+p JSON.parse(result)
+
+```
+
+```python
+import requests
+headers = {
+  'Content-Type': 'application/json',
+  'Authorization': 'Bearer {access-token}'
+}
+
+r = requests.post('http://localhost:5000/api/service-request-items/modification', headers = headers)
+
+print(r.json())
+
+```
+
+```php
+<?php
+
+require 'vendor/autoload.php';
+
+$headers = array(
+    'Content-Type' => 'application/json',
+    'Authorization' => 'Bearer {access-token}',
+);
+
+$client = new \GuzzleHttp\Client();
+
+// Define array of request body.
+$request_body = array();
+
+try {
+    $response = $client->request('POST','http://localhost:5000/api/service-request-items/modification', array(
+        'headers' => $headers,
+        'json' => $request_body,
+       )
+    );
+    print_r($response->getBody()->getContents());
+ }
+ catch (\GuzzleHttp\Exception\BadResponseException $e) {
+    // handle exception or api errors.
+    print_r($e->getMessage());
+ }
+
+ // ...
+
+```
+
+```java
+URL obj = new URL("http://localhost:5000/api/service-request-items/modification");
+HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+con.setRequestMethod("POST");
+int responseCode = con.getResponseCode();
+BufferedReader in = new BufferedReader(
+    new InputStreamReader(con.getInputStream()));
+String inputLine;
+StringBuffer response = new StringBuffer();
+while ((inputLine = in.readLine()) != null) {
+    response.append(inputLine);
+}
+in.close();
+System.out.println(response.toString());
+
+```
+
+```go
+package main
+
+import (
+       "bytes"
+       "net/http"
+)
+
+func main() {
+
+    headers := map[string][]string{
+        "Content-Type": []string{"application/json"},
+        "Authorization": []string{"Bearer {access-token}"},
+    }
+
+    data := bytes.NewBuffer([]byte{jsonReq})
+    req, err := http.NewRequest("POST", "http://localhost:5000/api/service-request-items/modification", data)
+    req.Header = headers
+
+    client := &http.Client{}
+    resp, err := client.Do(req)
+    // ...
+}
+
+```
+
+`POST /api/service-request-items/modification`
+
+*Créer une modification de billet*
+
+Enregistre une modification sur un billet existant.
+
+Cette opération :
+- crée un item de type modification
+- rattache l'opération au billet d'origine
+- met le billet parent au statut modified
+- génère les écritures comptables associées
+
+Seuls les billets ayant le statut active peuvent être modifiés.
+
+> Body parameter
+
+```json
+{
+  "parent_item_id": "2d6fc8c5-0b40-4c8a-b8b8-70cfc2e6f845",
+  "modification_fee": 50,
+  "debit_balance": 35,
+  "route": "KIN-BRU",
+  "travel_class": "Business",
+  "departure_date": "2019-08-24T14:15:22Z",
+  "notes": "Changement de date demandé par le client"
+}
+```
+
+<h3 id="post__api_service-request-items_modification-parameters">Parameters</h3>
+
+|Name|In|Type|Required|Description|
+|---|---|---|---|---|
+|body|body|object|true|none|
+|» parent_item_id|body|string(uuid)|true|none|
+|» modification_fee|body|number|true|none|
+|» debit_balance|body|number|false|Montant supplémentaire dû au partenaire|
+|» route|body|string|false|none|
+|» travel_class|body|string|false|none|
+|» departure_date|body|string(date-time)|false|none|
+|» notes|body|string|false|none|
+
+<h3 id="post__api_service-request-items_modification-responses">Responses</h3>
+
+|Status|Meaning|Description|Schema|
+|---|---|---|---|
+|201|[Created](https://tools.ietf.org/html/rfc7231#section-6.3.2)|Modification enregistrée avec succès|None|
+|400|[Bad Request](https://tools.ietf.org/html/rfc7231#section-6.5.1)|Données invalides ou billet non modifiable|None|
+|401|[Unauthorized](https://tools.ietf.org/html/rfc7235#section-3.1)|Non authentifié|None|
+|403|[Forbidden](https://tools.ietf.org/html/rfc7231#section-6.5.3)|Accès refusé|None|
+|404|[Not Found](https://tools.ietf.org/html/rfc7231#section-6.5.4)|Billet introuvable|None|
+|500|[Internal Server Error](https://tools.ietf.org/html/rfc7231#section-6.6.1)|Erreur serveur|None|
+
+<aside class="warning">
+To perform this operation, you must be authenticated by means of one of the following methods:
+bearerAuth
+</aside>
+
+## post__api_service-request-items_cancellation
+
+> Code samples
+
+```shell
+# You can also use wget
+curl -X POST http://localhost:5000/api/service-request-items/cancellation \
+  -H 'Content-Type: application/json' \
+  -H 'Authorization: Bearer {access-token}'
+
+```
+
+```http
+POST http://localhost:5000/api/service-request-items/cancellation HTTP/1.1
+Host: localhost:5000
+Content-Type: application/json
+
+```
+
+```javascript
+const inputBody = '{
+  "parent_item_id": "2d6fc8c5-0b40-4c8a-b8b8-70cfc2e6f845",
+  "airline_penalty": 150,
+  "cancellation_fee": 30,
+  "notes": "Annulation demandée par le client"
+}';
+const headers = {
+  'Content-Type':'application/json',
+  'Authorization':'Bearer {access-token}'
+};
+
+fetch('http://localhost:5000/api/service-request-items/cancellation',
+{
+  method: 'POST',
+  body: inputBody,
+  headers: headers
+})
+.then(function(res) {
+    return res.json();
+}).then(function(body) {
+    console.log(body);
+});
+
+```
+
+```ruby
+require 'rest-client'
+require 'json'
+
+headers = {
+  'Content-Type' => 'application/json',
+  'Authorization' => 'Bearer {access-token}'
+}
+
+result = RestClient.post 'http://localhost:5000/api/service-request-items/cancellation',
+  params: {
+  }, headers: headers
+
+p JSON.parse(result)
+
+```
+
+```python
+import requests
+headers = {
+  'Content-Type': 'application/json',
+  'Authorization': 'Bearer {access-token}'
+}
+
+r = requests.post('http://localhost:5000/api/service-request-items/cancellation', headers = headers)
+
+print(r.json())
+
+```
+
+```php
+<?php
+
+require 'vendor/autoload.php';
+
+$headers = array(
+    'Content-Type' => 'application/json',
+    'Authorization' => 'Bearer {access-token}',
+);
+
+$client = new \GuzzleHttp\Client();
+
+// Define array of request body.
+$request_body = array();
+
+try {
+    $response = $client->request('POST','http://localhost:5000/api/service-request-items/cancellation', array(
+        'headers' => $headers,
+        'json' => $request_body,
+       )
+    );
+    print_r($response->getBody()->getContents());
+ }
+ catch (\GuzzleHttp\Exception\BadResponseException $e) {
+    // handle exception or api errors.
+    print_r($e->getMessage());
+ }
+
+ // ...
+
+```
+
+```java
+URL obj = new URL("http://localhost:5000/api/service-request-items/cancellation");
+HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+con.setRequestMethod("POST");
+int responseCode = con.getResponseCode();
+BufferedReader in = new BufferedReader(
+    new InputStreamReader(con.getInputStream()));
+String inputLine;
+StringBuffer response = new StringBuffer();
+while ((inputLine = in.readLine()) != null) {
+    response.append(inputLine);
+}
+in.close();
+System.out.println(response.toString());
+
+```
+
+```go
+package main
+
+import (
+       "bytes"
+       "net/http"
+)
+
+func main() {
+
+    headers := map[string][]string{
+        "Content-Type": []string{"application/json"},
+        "Authorization": []string{"Bearer {access-token}"},
+    }
+
+    data := bytes.NewBuffer([]byte{jsonReq})
+    req, err := http.NewRequest("POST", "http://localhost:5000/api/service-request-items/cancellation", data)
+    req.Header = headers
+
+    client := &http.Client{}
+    resp, err := client.Do(req)
+    // ...
+}
+
+```
+
+`POST /api/service-request-items/cancellation`
+
+*Créer une annulation de billet*
+
+Enregistre une annulation sur un billet existant.
+
+Cette opération :
+- crée un item de type cancellation
+- rattache l'opération au billet d'origine
+- met le billet parent au statut cancelled
+- calcule automatiquement le remboursement client
+- génère les écritures comptables associées
+
+Seuls les billets ayant le statut active peuvent être annulés.
+
+> Body parameter
+
+```json
+{
+  "parent_item_id": "2d6fc8c5-0b40-4c8a-b8b8-70cfc2e6f845",
+  "airline_penalty": 150,
+  "cancellation_fee": 30,
+  "notes": "Annulation demandée par le client"
+}
+```
+
+<h3 id="post__api_service-request-items_cancellation-parameters">Parameters</h3>
+
+|Name|In|Type|Required|Description|
+|---|---|---|---|---|
+|body|body|object|true|none|
+|» parent_item_id|body|string(uuid)|true|none|
+|» airline_penalty|body|number|true|Montant retenu par la compagnie aérienne|
+|» cancellation_fee|body|number|false|Frais d'annulation prélevés par l'agence|
+|» notes|body|string|false|none|
+
+<h3 id="post__api_service-request-items_cancellation-responses">Responses</h3>
+
+|Status|Meaning|Description|Schema|
+|---|---|---|---|
+|201|[Created](https://tools.ietf.org/html/rfc7231#section-6.3.2)|Annulation enregistrée avec succès|None|
+|400|[Bad Request](https://tools.ietf.org/html/rfc7231#section-6.5.1)|Données invalides ou billet non annulable|None|
+|401|[Unauthorized](https://tools.ietf.org/html/rfc7235#section-3.1)|Non authentifié|None|
+|403|[Forbidden](https://tools.ietf.org/html/rfc7231#section-6.5.3)|Accès refusé|None|
+|404|[Not Found](https://tools.ietf.org/html/rfc7231#section-6.5.4)|Billet introuvable|None|
+|500|[Internal Server Error](https://tools.ietf.org/html/rfc7231#section-6.6.1)|Erreur serveur|None|
+
+<aside class="warning">
+To perform this operation, you must be authenticated by means of one of the following methods:
+bearerAuth
+</aside>
+
+## get__api_service-request-items_request_{id}
+
+> Code samples
+
+```shell
+# You can also use wget
+curl -X GET http://localhost:5000/api/service-request-items/request/{id} \
+  -H 'Accept: application/json' \
+  -H 'Authorization: Bearer {access-token}'
+
+```
+
+```http
+GET http://localhost:5000/api/service-request-items/request/{id} HTTP/1.1
+Host: localhost:5000
+Accept: application/json
+
+```
+
+```javascript
+
+const headers = {
+  'Accept':'application/json',
+  'Authorization':'Bearer {access-token}'
+};
+
+fetch('http://localhost:5000/api/service-request-items/request/{id}',
+{
+  method: 'GET',
+
+  headers: headers
+})
+.then(function(res) {
+    return res.json();
+}).then(function(body) {
+    console.log(body);
+});
+
+```
+
+```ruby
+require 'rest-client'
+require 'json'
+
+headers = {
+  'Accept' => 'application/json',
+  'Authorization' => 'Bearer {access-token}'
+}
+
+result = RestClient.get 'http://localhost:5000/api/service-request-items/request/{id}',
+  params: {
+  }, headers: headers
+
+p JSON.parse(result)
+
+```
+
+```python
+import requests
+headers = {
+  'Accept': 'application/json',
+  'Authorization': 'Bearer {access-token}'
+}
+
+r = requests.get('http://localhost:5000/api/service-request-items/request/{id}', headers = headers)
+
+print(r.json())
+
+```
+
+```php
+<?php
+
+require 'vendor/autoload.php';
+
+$headers = array(
+    'Accept' => 'application/json',
+    'Authorization' => 'Bearer {access-token}',
+);
+
+$client = new \GuzzleHttp\Client();
+
+// Define array of request body.
+$request_body = array();
+
+try {
+    $response = $client->request('GET','http://localhost:5000/api/service-request-items/request/{id}', array(
+        'headers' => $headers,
+        'json' => $request_body,
+       )
+    );
+    print_r($response->getBody()->getContents());
+ }
+ catch (\GuzzleHttp\Exception\BadResponseException $e) {
+    // handle exception or api errors.
+    print_r($e->getMessage());
+ }
+
+ // ...
+
+```
+
+```java
+URL obj = new URL("http://localhost:5000/api/service-request-items/request/{id}");
+HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+con.setRequestMethod("GET");
+int responseCode = con.getResponseCode();
+BufferedReader in = new BufferedReader(
+    new InputStreamReader(con.getInputStream()));
+String inputLine;
+StringBuffer response = new StringBuffer();
+while ((inputLine = in.readLine()) != null) {
+    response.append(inputLine);
+}
+in.close();
+System.out.println(response.toString());
+
+```
+
+```go
+package main
+
+import (
+       "bytes"
+       "net/http"
+)
+
+func main() {
+
+    headers := map[string][]string{
+        "Accept": []string{"application/json"},
+        "Authorization": []string{"Bearer {access-token}"},
+    }
+
+    data := bytes.NewBuffer([]byte{jsonReq})
+    req, err := http.NewRequest("GET", "http://localhost:5000/api/service-request-items/request/{id}", data)
+    req.Header = headers
+
+    client := &http.Client{}
+    resp, err := client.Do(req)
+    // ...
+}
+
+```
+
+`GET /api/service-request-items/request/{id}`
+
+*Liste des éléments d'une demande de service*
+
+Retourne tous les éléments (billets ou prestations) associés à une demande de service spécifique.
+
+<h3 id="get__api_service-request-items_request_{id}-parameters">Parameters</h3>
+
+|Name|In|Type|Required|Description|
+|---|---|---|---|---|
+|id|path|string(uuid)|true|Identifiant de la demande de service|
+
+> Example responses
+
+> 200 Response
+
+```json
+{
+  "success": true,
+  "message": "Items retrieved successfully",
+  "data": [
+    {
+      "id": "497f6eca-6276-4993-bfeb-53cbbbba6f08",
+      "request_id": "266ea41d-adf5-480b-af50-15b940c2b846",
+      "item_reference": "ITEM-1779454549397-3740",
+      "item_type": "ticket",
+      "item_status": "active",
+      "customer_name": "John Doe",
+      "airline_name": "Ethiopian Airlines",
+      "system_name": "Amadeus",
+      "ticket_number": 821234567890,
+      "pnr": "KQ82LP",
+      "route": "Kinshasa - Bruxelles",
+      "travel_class": "Economy",
+      "departure_date": "2019-08-24T14:15:22Z",
+      "issued_at": "2019-08-24T14:15:22Z",
+      "tht_amount": "800.00",
+      "tax_amount": "150.00",
+      "partner_service_fee": "0.00",
+      "service_fee": "20.00",
+      "commission_amount": "25.70",
+      "ttc_amount": "970.00",
+      "debit_balance": "944.30",
+      "notes": "Mission entreprise",
+      "created_at": "2019-08-24T14:15:22Z"
+    }
+  ]
+}
+```
+
+<h3 id="get__api_service-request-items_request_{id}-responses">Responses</h3>
+
+|Status|Meaning|Description|Schema|
+|---|---|---|---|
+|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|Éléments récupérés avec succès|Inline|
+|401|[Unauthorized](https://tools.ietf.org/html/rfc7235#section-3.1)|Non authentifié|None|
+|404|[Not Found](https://tools.ietf.org/html/rfc7231#section-6.5.4)|Demande de service introuvable|None|
+|500|[Internal Server Error](https://tools.ietf.org/html/rfc7231#section-6.6.1)|Erreur serveur|None|
+
+<h3 id="get__api_service-request-items_request_{id}-responseschema">Response Schema</h3>
+
+Status Code **200**
+
+|Name|Type|Required|Restrictions|Description|
+|---|---|---|---|---|
+|» success|boolean|false|none|none|
+|» message|string|false|none|none|
+|» data|[object]|false|none|none|
+|»» id|string(uuid)|false|none|none|
+|»» request_id|string(uuid)|false|none|none|
+|»» item_reference|string|false|none|none|
+|»» item_type|string|false|none|none|
+|»» item_status|string|false|none|none|
+|»» customer_name|string|false|none|none|
+|»» airline_name|string|false|none|none|
+|»» system_name|string|false|none|none|
+|»» ticket_number|string|false|none|none|
+|»» pnr|string|false|none|none|
+|»» route|string|false|none|none|
+|»» travel_class|string|false|none|none|
+|»» departure_date|string(date-time)|false|none|none|
+|»» issued_at|string(date-time)|false|none|none|
+|»» tht_amount|string|false|none|none|
+|»» tax_amount|string|false|none|none|
+|»» partner_service_fee|string|false|none|none|
+|»» service_fee|string|false|none|none|
+|»» commission_amount|string|false|none|none|
+|»» ttc_amount|string|false|none|none|
+|»» debit_balance|string|false|none|none|
+|»» notes|string|false|none|none|
+|»» created_at|string(date-time)|false|none|none|
 
 <aside class="warning">
 To perform this operation, you must be authenticated by means of one of the following methods:
@@ -10041,6 +10857,7 @@ Gestion des paiements et remboursements clients
 # You can also use wget
 curl -X POST http://localhost:5000/api/customer-payments \
   -H 'Content-Type: application/json' \
+  -H 'Accept: application/json' \
   -H 'Authorization: Bearer {access-token}'
 
 ```
@@ -10049,6 +10866,7 @@ curl -X POST http://localhost:5000/api/customer-payments \
 POST http://localhost:5000/api/customer-payments HTTP/1.1
 Host: localhost:5000
 Content-Type: application/json
+Accept: application/json
 
 ```
 
@@ -10063,6 +10881,7 @@ const inputBody = '{
 }';
 const headers = {
   'Content-Type':'application/json',
+  'Accept':'application/json',
   'Authorization':'Bearer {access-token}'
 };
 
@@ -10086,6 +10905,7 @@ require 'json'
 
 headers = {
   'Content-Type' => 'application/json',
+  'Accept' => 'application/json',
   'Authorization' => 'Bearer {access-token}'
 }
 
@@ -10101,6 +10921,7 @@ p JSON.parse(result)
 import requests
 headers = {
   'Content-Type': 'application/json',
+  'Accept': 'application/json',
   'Authorization': 'Bearer {access-token}'
 }
 
@@ -10117,6 +10938,7 @@ require 'vendor/autoload.php';
 
 $headers = array(
     'Content-Type' => 'application/json',
+    'Accept' => 'application/json',
     'Authorization' => 'Bearer {access-token}',
 );
 
@@ -10171,6 +10993,7 @@ func main() {
 
     headers := map[string][]string{
         "Content-Type": []string{"application/json"},
+        "Accept": []string{"application/json"},
         "Authorization": []string{"Bearer {access-token}"},
     }
 
@@ -10211,20 +11034,69 @@ Enregistre un paiement ou un remboursement associé à une demande de service.
 |body|body|object|true|none|
 |» request_id|body|string(uuid)|true|none|
 |» payment_method|body|string|true|none|
-|» payment_type|body|string|true|payment ou refund|
+|» payment_type|body|string|true|none|
 |» amount|body|number|true|none|
-|» currency|body|string|true|none|
+|» currency|body|string|false|none|
 |» observation|body|string|false|none|
+
+#### Enumerated Values
+
+|Parameter|Value|
+|---|---|
+|» payment_type|payment|
+|» payment_type|refund|
+
+> Example responses
+
+> Violation d'une règle métier
+
+```json
+{
+  "success": false,
+  "message": "Request is already fully paid"
+}
+```
+
+```json
+{
+  "success": false,
+  "message": "Maximum allowed payment is 500"
+}
+```
+
+```json
+{
+  "success": false,
+  "message": "Maximum refundable amount is 1000"
+}
+```
+
+```json
+{
+  "success": false,
+  "message": "Payments cannot be added to a cancelled request"
+}
+```
+
+```json
+{
+  "success": false,
+  "message": "Payment amount must be greater than zero"
+}
+```
 
 <h3 id="post__api_customer-payments-responses">Responses</h3>
 
 |Status|Meaning|Description|Schema|
 |---|---|---|---|
 |201|[Created](https://tools.ietf.org/html/rfc7231#section-6.3.2)|Paiement enregistré avec succès|None|
-|400|[Bad Request](https://tools.ietf.org/html/rfc7231#section-6.5.1)|Données invalides|None|
+|400|[Bad Request](https://tools.ietf.org/html/rfc7231#section-6.5.1)|Violation d'une règle métier|None|
 |401|[Unauthorized](https://tools.ietf.org/html/rfc7235#section-3.1)|Non authentifié|None|
 |403|[Forbidden](https://tools.ietf.org/html/rfc7231#section-6.5.3)|Accès refusé|None|
+|404|[Not Found](https://tools.ietf.org/html/rfc7231#section-6.5.4)|Dossier introuvable|None|
 |500|[Internal Server Error](https://tools.ietf.org/html/rfc7231#section-6.6.1)|Erreur serveur|None|
+
+<h3 id="post__api_customer-payments-responseschema">Response Schema</h3>
 
 <aside class="warning">
 To perform this operation, you must be authenticated by means of one of the following methods:
@@ -10460,6 +11332,169 @@ To perform this operation, you must be authenticated by means of one of the foll
 bearerAuth
 </aside>
 
+## get__api_customer-payments_request_{id}
+
+> Code samples
+
+```shell
+# You can also use wget
+curl -X GET http://localhost:5000/api/customer-payments/request/{id} \
+  -H 'Authorization: Bearer {access-token}'
+
+```
+
+```http
+GET http://localhost:5000/api/customer-payments/request/{id} HTTP/1.1
+Host: localhost:5000
+
+```
+
+```javascript
+
+const headers = {
+  'Authorization':'Bearer {access-token}'
+};
+
+fetch('http://localhost:5000/api/customer-payments/request/{id}',
+{
+  method: 'GET',
+
+  headers: headers
+})
+.then(function(res) {
+    return res.json();
+}).then(function(body) {
+    console.log(body);
+});
+
+```
+
+```ruby
+require 'rest-client'
+require 'json'
+
+headers = {
+  'Authorization' => 'Bearer {access-token}'
+}
+
+result = RestClient.get 'http://localhost:5000/api/customer-payments/request/{id}',
+  params: {
+  }, headers: headers
+
+p JSON.parse(result)
+
+```
+
+```python
+import requests
+headers = {
+  'Authorization': 'Bearer {access-token}'
+}
+
+r = requests.get('http://localhost:5000/api/customer-payments/request/{id}', headers = headers)
+
+print(r.json())
+
+```
+
+```php
+<?php
+
+require 'vendor/autoload.php';
+
+$headers = array(
+    'Authorization' => 'Bearer {access-token}',
+);
+
+$client = new \GuzzleHttp\Client();
+
+// Define array of request body.
+$request_body = array();
+
+try {
+    $response = $client->request('GET','http://localhost:5000/api/customer-payments/request/{id}', array(
+        'headers' => $headers,
+        'json' => $request_body,
+       )
+    );
+    print_r($response->getBody()->getContents());
+ }
+ catch (\GuzzleHttp\Exception\BadResponseException $e) {
+    // handle exception or api errors.
+    print_r($e->getMessage());
+ }
+
+ // ...
+
+```
+
+```java
+URL obj = new URL("http://localhost:5000/api/customer-payments/request/{id}");
+HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+con.setRequestMethod("GET");
+int responseCode = con.getResponseCode();
+BufferedReader in = new BufferedReader(
+    new InputStreamReader(con.getInputStream()));
+String inputLine;
+StringBuffer response = new StringBuffer();
+while ((inputLine = in.readLine()) != null) {
+    response.append(inputLine);
+}
+in.close();
+System.out.println(response.toString());
+
+```
+
+```go
+package main
+
+import (
+       "bytes"
+       "net/http"
+)
+
+func main() {
+
+    headers := map[string][]string{
+        "Authorization": []string{"Bearer {access-token}"},
+    }
+
+    data := bytes.NewBuffer([]byte{jsonReq})
+    req, err := http.NewRequest("GET", "http://localhost:5000/api/customer-payments/request/{id}", data)
+    req.Header = headers
+
+    client := &http.Client{}
+    resp, err := client.Do(req)
+    // ...
+}
+
+```
+
+`GET /api/customer-payments/request/{id}`
+
+*Liste des paiements d'une demande de service*
+
+Retourne tous les paiements associés à un dossier spécifique.
+
+<h3 id="get__api_customer-payments_request_{id}-parameters">Parameters</h3>
+
+|Name|In|Type|Required|Description|
+|---|---|---|---|---|
+|id|path|string(uuid)|true|Identifiant de la demande de service|
+
+<h3 id="get__api_customer-payments_request_{id}-responses">Responses</h3>
+
+|Status|Meaning|Description|Schema|
+|---|---|---|---|
+|200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|Paiements récupérés avec succès|None|
+|401|[Unauthorized](https://tools.ietf.org/html/rfc7235#section-3.1)|Non authentifié|None|
+|404|[Not Found](https://tools.ietf.org/html/rfc7231#section-6.5.4)|Dossier introuvable|None|
+
+<aside class="warning">
+To perform this operation, you must be authenticated by means of one of the following methods:
+bearerAuth
+</aside>
+
 ## put__api_customer-payments_{id}
 
 > Code samples
@@ -10468,6 +11503,7 @@ bearerAuth
 # You can also use wget
 curl -X PUT http://localhost:5000/api/customer-payments/{id} \
   -H 'Content-Type: application/json' \
+  -H 'Accept: application/json' \
   -H 'Authorization: Bearer {access-token}'
 
 ```
@@ -10476,6 +11512,7 @@ curl -X PUT http://localhost:5000/api/customer-payments/{id} \
 PUT http://localhost:5000/api/customer-payments/{id} HTTP/1.1
 Host: localhost:5000
 Content-Type: application/json
+Accept: application/json
 
 ```
 
@@ -10483,10 +11520,12 @@ Content-Type: application/json
 const inputBody = '{
   "payment_method": "bank_transfer",
   "amount": 750,
+  "currency": "USD",
   "observation": "Paiement corrigé après rapprochement bancaire"
 }';
 const headers = {
   'Content-Type':'application/json',
+  'Accept':'application/json',
   'Authorization':'Bearer {access-token}'
 };
 
@@ -10510,6 +11549,7 @@ require 'json'
 
 headers = {
   'Content-Type' => 'application/json',
+  'Accept' => 'application/json',
   'Authorization' => 'Bearer {access-token}'
 }
 
@@ -10525,6 +11565,7 @@ p JSON.parse(result)
 import requests
 headers = {
   'Content-Type': 'application/json',
+  'Accept': 'application/json',
   'Authorization': 'Bearer {access-token}'
 }
 
@@ -10541,6 +11582,7 @@ require 'vendor/autoload.php';
 
 $headers = array(
     'Content-Type' => 'application/json',
+    'Accept' => 'application/json',
     'Authorization' => 'Bearer {access-token}',
 );
 
@@ -10595,6 +11637,7 @@ func main() {
 
     headers := map[string][]string{
         "Content-Type": []string{"application/json"},
+        "Accept": []string{"application/json"},
         "Authorization": []string{"Bearer {access-token}"},
     }
 
@@ -10613,7 +11656,7 @@ func main() {
 
 *Modifier un paiement client*
 
-Met à jour les informations d'un paiement ou remboursement.
+Met à jour un paiement client existant. Les remboursements ne peuvent pas être modifiés. Les paiements d'un dossier annulé ou entièrement soldé ne peuvent pas être modifiés.
 
 > Body parameter
 
@@ -10621,6 +11664,7 @@ Met à jour les informations d'un paiement ou remboursement.
 {
   "payment_method": "bank_transfer",
   "amount": 750,
+  "currency": "USD",
   "observation": "Paiement corrigé après rapprochement bancaire"
 }
 ```
@@ -10633,18 +11677,60 @@ Met à jour les informations d'un paiement ou remboursement.
 |body|body|object|true|none|
 |» payment_method|body|string|false|none|
 |» amount|body|number|false|none|
+|» currency|body|string|false|none|
 |» observation|body|string|false|none|
+
+> Example responses
+
+> Violation d'une règle métier
+
+```json
+{
+  "success": false,
+  "message": "Payments of completed requests cannot be modified"
+}
+```
+
+```json
+{
+  "success": false,
+  "message": "Payments of cancelled requests cannot be modified"
+}
+```
+
+```json
+{
+  "success": false,
+  "message": "Refund payments cannot be modified"
+}
+```
+
+```json
+{
+  "success": false,
+  "message": "Payment amount must be greater than zero"
+}
+```
+
+```json
+{
+  "success": false,
+  "message": "Maximum allowed amount is 500"
+}
+```
 
 <h3 id="put__api_customer-payments_{id}-responses">Responses</h3>
 
 |Status|Meaning|Description|Schema|
 |---|---|---|---|
 |200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|Paiement modifié avec succès|None|
-|400|[Bad Request](https://tools.ietf.org/html/rfc7231#section-6.5.1)|Données invalides|None|
+|400|[Bad Request](https://tools.ietf.org/html/rfc7231#section-6.5.1)|Violation d'une règle métier|None|
 |401|[Unauthorized](https://tools.ietf.org/html/rfc7235#section-3.1)|Non authentifié|None|
 |403|[Forbidden](https://tools.ietf.org/html/rfc7231#section-6.5.3)|Accès refusé|None|
-|404|[Not Found](https://tools.ietf.org/html/rfc7231#section-6.5.4)|Paiement introuvable|None|
+|404|[Not Found](https://tools.ietf.org/html/rfc7231#section-6.5.4)|Paiement ou dossier introuvable|None|
 |500|[Internal Server Error](https://tools.ietf.org/html/rfc7231#section-6.6.1)|Erreur serveur|None|
+
+<h3 id="put__api_customer-payments_{id}-responseschema">Response Schema</h3>
 
 <aside class="warning">
 To perform this operation, you must be authenticated by means of one of the following methods:
@@ -10658,6 +11744,7 @@ bearerAuth
 ```shell
 # You can also use wget
 curl -X DELETE http://localhost:5000/api/customer-payments/{id} \
+  -H 'Accept: application/json' \
   -H 'Authorization: Bearer {access-token}'
 
 ```
@@ -10665,12 +11752,14 @@ curl -X DELETE http://localhost:5000/api/customer-payments/{id} \
 ```http
 DELETE http://localhost:5000/api/customer-payments/{id} HTTP/1.1
 Host: localhost:5000
+Accept: application/json
 
 ```
 
 ```javascript
 
 const headers = {
+  'Accept':'application/json',
   'Authorization':'Bearer {access-token}'
 };
 
@@ -10693,6 +11782,7 @@ require 'rest-client'
 require 'json'
 
 headers = {
+  'Accept' => 'application/json',
   'Authorization' => 'Bearer {access-token}'
 }
 
@@ -10707,6 +11797,7 @@ p JSON.parse(result)
 ```python
 import requests
 headers = {
+  'Accept': 'application/json',
   'Authorization': 'Bearer {access-token}'
 }
 
@@ -10722,6 +11813,7 @@ print(r.json())
 require 'vendor/autoload.php';
 
 $headers = array(
+    'Accept' => 'application/json',
     'Authorization' => 'Bearer {access-token}',
 );
 
@@ -10775,6 +11867,7 @@ import (
 func main() {
 
     headers := map[string][]string{
+        "Accept": []string{"application/json"},
         "Authorization": []string{"Bearer {access-token}"},
     }
 
@@ -10793,7 +11886,7 @@ func main() {
 
 *Supprimer un paiement client*
 
-Effectue une suppression logique d'un paiement ou remboursement.
+Effectue une suppression logique d'un paiement client. Les remboursements, les paiements d'un dossier annulé ou d'un dossier soldé ne peuvent pas être supprimés.
 
 <h3 id="delete__api_customer-payments_{id}-parameters">Parameters</h3>
 
@@ -10801,15 +11894,43 @@ Effectue une suppression logique d'un paiement ou remboursement.
 |---|---|---|---|---|
 |id|path|string(uuid)|true|Identifiant du paiement|
 
+> Example responses
+
+> Violation d'une règle métier
+
+```json
+{
+  "success": false,
+  "message": "Payments of completed requests cannot be deleted"
+}
+```
+
+```json
+{
+  "success": false,
+  "message": "Payments of cancelled requests cannot be deleted"
+}
+```
+
+```json
+{
+  "success": false,
+  "message": "Refund payments cannot be deleted"
+}
+```
+
 <h3 id="delete__api_customer-payments_{id}-responses">Responses</h3>
 
 |Status|Meaning|Description|Schema|
 |---|---|---|---|
 |200|[OK](https://tools.ietf.org/html/rfc7231#section-6.3.1)|Paiement supprimé avec succès|None|
+|400|[Bad Request](https://tools.ietf.org/html/rfc7231#section-6.5.1)|Violation d'une règle métier|None|
 |401|[Unauthorized](https://tools.ietf.org/html/rfc7235#section-3.1)|Non authentifié|None|
 |403|[Forbidden](https://tools.ietf.org/html/rfc7231#section-6.5.3)|Accès refusé|None|
-|404|[Not Found](https://tools.ietf.org/html/rfc7231#section-6.5.4)|Paiement introuvable|None|
+|404|[Not Found](https://tools.ietf.org/html/rfc7231#section-6.5.4)|Paiement ou dossier introuvable|None|
 |500|[Internal Server Error](https://tools.ietf.org/html/rfc7231#section-6.6.1)|Erreur serveur|None|
+
+<h3 id="delete__api_customer-payments_{id}-responseschema">Response Schema</h3>
 
 <aside class="warning">
 To perform this operation, you must be authenticated by means of one of the following methods:

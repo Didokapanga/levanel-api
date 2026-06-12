@@ -89,7 +89,8 @@ export class TicketAdjustmentService {
 
       const item =
         await itemRepository.findById(
-          data.item_id
+          data.item_id,
+          client
         );
 
       if (!item) {
@@ -103,7 +104,8 @@ export class TicketAdjustmentService {
       const adjustment =
         await repository.create(
           data,
-          actorId
+          actorId,
+          client
         );
 
       /*
@@ -188,7 +190,10 @@ export class TicketAdjustmentService {
               description:
                 `Agency modification fee ${adjustment.adjustment_reference}`
 
-            }, actorId);
+            },
+            actorId,
+            client
+          );
         }
 
         /*
@@ -218,7 +223,9 @@ export class TicketAdjustmentService {
 
             description:
               `Ticket modified ${adjustment.adjustment_reference}`
-          });
+          },
+          client
+        );
       }
 
       /*
@@ -260,7 +267,11 @@ export class TicketAdjustmentService {
 
               item.contract_id,
 
-              data.refund_amount
+              data.refund_amount,
+
+              actorId,
+
+              client
             );
         }
 
@@ -320,7 +331,10 @@ export class TicketAdjustmentService {
               description:
                 `Airline cancellation fee ${adjustment.adjustment_reference}`
 
-            }, actorId);
+            },
+            actorId,
+            client
+          );
         }
 
         if (
@@ -369,7 +383,10 @@ export class TicketAdjustmentService {
               description:
                 `Agency cancellation fee ${adjustment.adjustment_reference}`
 
-            }, actorId);
+            },
+            actorId,
+            client
+          );
         }
 
         if (
@@ -418,7 +435,10 @@ export class TicketAdjustmentService {
               description:
                 `Customer refund ${adjustment.adjustment_reference}`
 
-            }, actorId);
+            },
+            actorId,
+            client
+          );
         }
 
         /*
@@ -448,7 +468,9 @@ export class TicketAdjustmentService {
 
             description:
               `Ticket cancelled ${adjustment.adjustment_reference}`
-          });
+          },
+          client
+        );
       }
 
       /*
@@ -458,12 +480,14 @@ export class TicketAdjustmentService {
 
       await requestRepository
         .updateFinancialTotals(
-          item.request_id
+          item.request_id,
+          client
         );
 
       await requestRepository
         .updateRequestStatus(
-          item.request_id
+          item.request_id,
+          client
         );
 
       await client.query(
@@ -519,73 +543,106 @@ export class TicketAdjustmentService {
     actorId: string
   ) {
 
-    const adjustment =
-      await repository.findById(id);
+    const client =
+      await db.connect();
 
-    if (!adjustment) {
+    try {
 
-      throw new ApiError(
-        'Adjustment not found',
-        404
-      );
-    }
-
-    /*
-      Protection audit
-    */
-
-    if (
-      adjustment.adjustment_type
-      === 'cancellation'
-    ) {
-
-      throw new ApiError(
-
-        'Cancellation adjustment cannot be modified',
-
-        400
-      );
-    }
-
-    const updated =
-      await repository.update(
-        id,
-        data,
-        actorId
+      await client.query(
+        'BEGIN'
       );
 
-    /*
-      Audit log
-    */
+      const adjustment =
+        await repository.findById(
+          id,
+          client
+        );
 
-    await auditLogService
-      .createLog({
+      if (!adjustment) {
 
-        module:
-          'ticket_adjustments',
+        throw new ApiError(
+          'Adjustment not found',
+          404
+        );
+      }
 
-        entity_id:
-          updated.id,
+      /*
+        Protection audit
+      */
 
-        action_type:
-          'update',
+      if (
+        adjustment.adjustment_type
+        === 'cancellation'
+      ) {
 
-        actor_id:
+        throw new ApiError(
+
+          'Cancellation adjustment cannot be modified',
+
+          400
+        );
+      }
+
+      const updated =
+        await repository.update(
+          id,
+          data,
           actorId,
+          client
+        );
 
-        old_data:
-          adjustment,
+      /*
+        Audit log
+      */
 
-        new_data:
-          updated,
+      await auditLogService
+        .createLog({
 
-        description:
-          `Adjustment ${updated.adjustment_reference} updated`
-      });
+          module:
+            'ticket_adjustments',
 
-    return sanitizeTicketAdjustment(
-      updated
-    );
+          entity_id:
+            updated.id,
+
+          action_type:
+            'update',
+
+          actor_id:
+            actorId,
+
+          old_data:
+            adjustment,
+
+          new_data:
+            updated,
+
+          description:
+            `Adjustment ${updated.adjustment_reference} updated`
+
+        },
+        client
+      );
+
+      await client.query(
+        'COMMIT'
+      );
+
+      return sanitizeTicketAdjustment(
+        updated
+      );
+
+    } catch (error) {
+
+      await client.query(
+        'ROLLBACK'
+      );
+
+      throw error;
+
+    } finally {
+
+      client.release();
+    }
   }
 
   async delete(
@@ -593,66 +650,99 @@ export class TicketAdjustmentService {
     actorId: string
   ) {
 
-    const adjustment =
-      await repository.findById(id);
+    const client =
+      await db.connect();
 
-    if (!adjustment) {
+    try {
 
-      throw new ApiError(
-        'Adjustment not found',
-        404
+      await client.query(
+        'BEGIN'
       );
-    }
 
-    /*
-      Protection critique
-    */
+      const adjustment =
+        await repository.findById(
+          id,
+          client
+        );
 
-    if (
-      adjustment.adjustment_type
-      === 'cancellation'
-    ) {
+      if (!adjustment) {
 
-      throw new ApiError(
+        throw new ApiError(
+          'Adjustment not found',
+          404
+        );
+      }
 
-        'Cancellation adjustment cannot be deleted',
+      /*
+        Protection critique
+      */
 
-        400
+      if (
+        adjustment.adjustment_type
+        === 'cancellation'
+      ) {
+
+        throw new ApiError(
+
+          'Cancellation adjustment cannot be deleted',
+
+          400
+        );
+      }
+
+      await repository.softDelete(
+        id,
+        actorId,
+        client
       );
+
+      /*
+        Audit log
+      */
+
+      await auditLogService
+        .createLog({
+
+          module:
+            'ticket_adjustments',
+
+          entity_id:
+            adjustment.id,
+
+          action_type:
+            'delete',
+
+          actor_id:
+            actorId,
+
+          old_data:
+            adjustment,
+
+          new_data:
+            null,
+
+          description:
+            `Adjustment ${adjustment.adjustment_reference} deleted`
+
+        },
+        client
+      );
+
+      await client.query(
+        'COMMIT'
+      );
+
+    } catch (error) {
+
+      await client.query(
+        'ROLLBACK'
+      );
+
+      throw error;
+
+    } finally {
+
+      client.release();
     }
-
-    await repository.softDelete(
-      id,
-      actorId
-    );
-
-    /*
-      Audit log
-    */
-
-    await auditLogService
-      .createLog({
-
-        module:
-          'ticket_adjustments',
-
-        entity_id:
-          adjustment.id,
-
-        action_type:
-          'delete',
-
-        actor_id:
-          actorId,
-
-        old_data:
-          adjustment,
-
-        new_data:
-          null,
-
-        description:
-          `Adjustment ${adjustment.adjustment_reference} deleted`
-      });
   }
 }

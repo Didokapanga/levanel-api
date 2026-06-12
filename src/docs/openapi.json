@@ -1681,6 +1681,32 @@
       }
     },
     "/api/service-requests/{id}": {
+      "get": {
+        "summary": "Détail d'une demande de service",
+        "description": "Retourne toutes les informations d'un dossier.",
+        "tags": [
+          "Service Requests"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Dossier récupéré avec succès"
+          },
+          "404": {
+            "description": "Dossier introuvable"
+          }
+        }
+      },
       "put": {
         "summary": "Modifier une demande de service",
         "description": "Met à jour une demande de service existante.",
@@ -2081,6 +2107,297 @@
           },
           "401": {
             "description": "Non authentifié"
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      }
+    },
+    "/api/service-request-items/modification": {
+      "post": {
+        "summary": "Créer une modification de billet",
+        "description": "Enregistre une modification sur un billet existant.\n\nCette opération :\n- crée un item de type modification\n- rattache l'opération au billet d'origine\n- met le billet parent au statut modified\n- génère les écritures comptables associées\n\nSeuls les billets ayant le statut active peuvent être modifiés.\n",
+        "tags": [
+          "Service Request Items"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "parent_item_id",
+                  "modification_fee"
+                ],
+                "properties": {
+                  "parent_item_id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "example": "2d6fc8c5-0b40-4c8a-b8b8-70cfc2e6f845"
+                  },
+                  "modification_fee": {
+                    "type": "number",
+                    "example": 50
+                  },
+                  "debit_balance": {
+                    "type": "number",
+                    "example": 35,
+                    "description": "Montant supplémentaire dû au partenaire"
+                  },
+                  "route": {
+                    "type": "string",
+                    "example": "KIN-BRU"
+                  },
+                  "travel_class": {
+                    "type": "string",
+                    "example": "Business"
+                  },
+                  "departure_date": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "notes": {
+                    "type": "string",
+                    "example": "Changement de date demandé par le client"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Modification enregistrée avec succès"
+          },
+          "400": {
+            "description": "Données invalides ou billet non modifiable"
+          },
+          "401": {
+            "description": "Non authentifié"
+          },
+          "403": {
+            "description": "Accès refusé"
+          },
+          "404": {
+            "description": "Billet introuvable"
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      }
+    },
+    "/api/service-request-items/cancellation": {
+      "post": {
+        "summary": "Créer une annulation de billet",
+        "description": "Enregistre une annulation sur un billet existant.\n\nCette opération :\n- crée un item de type cancellation\n- rattache l'opération au billet d'origine\n- met le billet parent au statut cancelled\n- calcule automatiquement le remboursement client\n- génère les écritures comptables associées\n\nSeuls les billets ayant le statut active peuvent être annulés.\n",
+        "tags": [
+          "Service Request Items"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "parent_item_id",
+                  "airline_penalty"
+                ],
+                "properties": {
+                  "parent_item_id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "example": "2d6fc8c5-0b40-4c8a-b8b8-70cfc2e6f845"
+                  },
+                  "airline_penalty": {
+                    "type": "number",
+                    "example": 150,
+                    "description": "Montant retenu par la compagnie aérienne"
+                  },
+                  "cancellation_fee": {
+                    "type": "number",
+                    "example": 30,
+                    "description": "Frais d'annulation prélevés par l'agence"
+                  },
+                  "notes": {
+                    "type": "string",
+                    "example": "Annulation demandée par le client"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Annulation enregistrée avec succès"
+          },
+          "400": {
+            "description": "Données invalides ou billet non annulable"
+          },
+          "401": {
+            "description": "Non authentifié"
+          },
+          "403": {
+            "description": "Accès refusé"
+          },
+          "404": {
+            "description": "Billet introuvable"
+          },
+          "500": {
+            "description": "Erreur serveur"
+          }
+        }
+      }
+    },
+    "/api/service-request-items/request/{id}": {
+      "get": {
+        "summary": "Liste des éléments d'une demande de service",
+        "description": "Retourne tous les éléments (billets ou prestations) associés à une demande de service spécifique.",
+        "tags": [
+          "Service Request Items"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Identifiant de la demande de service"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Éléments récupérés avec succès",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Items retrieved successfully"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "request_id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "item_reference": {
+                            "type": "string",
+                            "example": "ITEM-1779454549397-3740"
+                          },
+                          "item_type": {
+                            "type": "string",
+                            "example": "ticket"
+                          },
+                          "item_status": {
+                            "type": "string",
+                            "example": "active"
+                          },
+                          "customer_name": {
+                            "type": "string",
+                            "example": "John Doe"
+                          },
+                          "airline_name": {
+                            "type": "string",
+                            "example": "Ethiopian Airlines"
+                          },
+                          "system_name": {
+                            "type": "string",
+                            "example": "Amadeus"
+                          },
+                          "ticket_number": {
+                            "type": "string",
+                            "example": 821234567890
+                          },
+                          "pnr": {
+                            "type": "string",
+                            "example": "KQ82LP"
+                          },
+                          "route": {
+                            "type": "string",
+                            "example": "Kinshasa - Bruxelles"
+                          },
+                          "travel_class": {
+                            "type": "string",
+                            "example": "Economy"
+                          },
+                          "departure_date": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "issued_at": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "tht_amount": {
+                            "type": "string",
+                            "example": "800.00"
+                          },
+                          "tax_amount": {
+                            "type": "string",
+                            "example": "150.00"
+                          },
+                          "partner_service_fee": {
+                            "type": "string",
+                            "example": "0.00"
+                          },
+                          "service_fee": {
+                            "type": "string",
+                            "example": "20.00"
+                          },
+                          "commission_amount": {
+                            "type": "string",
+                            "example": "25.70"
+                          },
+                          "ttc_amount": {
+                            "type": "string",
+                            "example": "970.00"
+                          },
+                          "debit_balance": {
+                            "type": "string",
+                            "example": "944.30"
+                          },
+                          "notes": {
+                            "type": "string",
+                            "example": "Mission entreprise"
+                          },
+                          "created_at": {
+                            "type": "string",
+                            "format": "date-time"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Non authentifié"
+          },
+          "404": {
+            "description": "Demande de service introuvable"
           },
           "500": {
             "description": "Erreur serveur"
@@ -3093,8 +3410,7 @@
                   "request_id",
                   "payment_method",
                   "payment_type",
-                  "amount",
-                  "currency"
+                  "amount"
                 ],
                 "properties": {
                   "request_id": {
@@ -3108,11 +3424,15 @@
                   },
                   "payment_type": {
                     "type": "string",
-                    "example": "payment",
-                    "description": "payment ou refund"
+                    "enum": [
+                      "payment",
+                      "refund"
+                    ],
+                    "example": "payment"
                   },
                   "amount": {
                     "type": "number",
+                    "minimum": 0.01,
                     "example": 500
                   },
                   "currency": {
@@ -3133,13 +3453,57 @@
             "description": "Paiement enregistré avec succès"
           },
           "400": {
-            "description": "Données invalides"
+            "description": "Violation d'une règle métier",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "already_paid": {
+                    "summary": "Dossier déjà soldé",
+                    "value": {
+                      "success": false,
+                      "message": "Request is already fully paid"
+                    }
+                  },
+                  "payment_too_large": {
+                    "summary": "Paiement supérieur au reste à payer",
+                    "value": {
+                      "success": false,
+                      "message": "Maximum allowed payment is 500"
+                    }
+                  },
+                  "refund_too_large": {
+                    "summary": "Remboursement supérieur au montant payé",
+                    "value": {
+                      "success": false,
+                      "message": "Maximum refundable amount is 1000"
+                    }
+                  },
+                  "cancelled_request": {
+                    "summary": "Dossier annulé",
+                    "value": {
+                      "success": false,
+                      "message": "Payments cannot be added to a cancelled request"
+                    }
+                  },
+                  "invalid_amount": {
+                    "summary": "Montant invalide",
+                    "value": {
+                      "success": false,
+                      "message": "Payment amount must be greater than zero"
+                    }
+                  }
+                }
+              }
+            }
           },
           "401": {
             "description": "Non authentifié"
           },
           "403": {
             "description": "Accès refusé"
+          },
+          "404": {
+            "description": "Dossier introuvable"
           },
           "500": {
             "description": "Erreur serveur"
@@ -3289,10 +3653,42 @@
         }
       }
     },
+    "/api/customer-payments/request/{id}": {
+      "get": {
+        "summary": "Liste des paiements d'une demande de service",
+        "description": "Retourne tous les paiements associés à un dossier spécifique.",
+        "tags": [
+          "Customer Payments"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Identifiant de la demande de service"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paiements récupérés avec succès"
+          },
+          "401": {
+            "description": "Non authentifié"
+          },
+          "404": {
+            "description": "Dossier introuvable"
+          }
+        }
+      }
+    },
     "/api/customer-payments/{id}": {
       "put": {
         "summary": "Modifier un paiement client",
-        "description": "Met à jour les informations d'un paiement ou remboursement.",
+        "description": "Met à jour un paiement client existant. Les remboursements ne peuvent pas être modifiés. Les paiements d'un dossier annulé ou entièrement soldé ne peuvent pas être modifiés.",
         "tags": [
           "Customer Payments"
         ],
@@ -3321,7 +3717,12 @@
                   },
                   "amount": {
                     "type": "number",
+                    "minimum": 0.01,
                     "example": 750
+                  },
+                  "currency": {
+                    "type": "string",
+                    "example": "USD"
                   },
                   "observation": {
                     "type": "string",
@@ -3337,7 +3738,48 @@
             "description": "Paiement modifié avec succès"
           },
           "400": {
-            "description": "Données invalides"
+            "description": "Violation d'une règle métier",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "completed_request": {
+                    "summary": "Dossier soldé",
+                    "value": {
+                      "success": false,
+                      "message": "Payments of completed requests cannot be modified"
+                    }
+                  },
+                  "cancelled_request": {
+                    "summary": "Dossier annulé",
+                    "value": {
+                      "success": false,
+                      "message": "Payments of cancelled requests cannot be modified"
+                    }
+                  },
+                  "refund_payment": {
+                    "summary": "Paiement de type remboursement",
+                    "value": {
+                      "success": false,
+                      "message": "Refund payments cannot be modified"
+                    }
+                  },
+                  "invalid_amount": {
+                    "summary": "Montant invalide",
+                    "value": {
+                      "success": false,
+                      "message": "Payment amount must be greater than zero"
+                    }
+                  },
+                  "exceeded_amount": {
+                    "summary": "Dépassement du montant autorisé",
+                    "value": {
+                      "success": false,
+                      "message": "Maximum allowed amount is 500"
+                    }
+                  }
+                }
+              }
+            }
           },
           "401": {
             "description": "Non authentifié"
@@ -3346,7 +3788,7 @@
             "description": "Accès refusé"
           },
           "404": {
-            "description": "Paiement introuvable"
+            "description": "Paiement ou dossier introuvable"
           },
           "500": {
             "description": "Erreur serveur"
@@ -3355,7 +3797,7 @@
       },
       "delete": {
         "summary": "Supprimer un paiement client",
-        "description": "Effectue une suppression logique d'un paiement ou remboursement.",
+        "description": "Effectue une suppression logique d'un paiement client. Les remboursements, les paiements d'un dossier annulé ou d'un dossier soldé ne peuvent pas être supprimés.",
         "tags": [
           "Customer Payments"
         ],
@@ -3375,6 +3817,36 @@
           "200": {
             "description": "Paiement supprimé avec succès"
           },
+          "400": {
+            "description": "Violation d'une règle métier",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "completed_request": {
+                    "summary": "Dossier soldé",
+                    "value": {
+                      "success": false,
+                      "message": "Payments of completed requests cannot be deleted"
+                    }
+                  },
+                  "cancelled_request": {
+                    "summary": "Dossier annulé",
+                    "value": {
+                      "success": false,
+                      "message": "Payments of cancelled requests cannot be deleted"
+                    }
+                  },
+                  "refund_payment": {
+                    "summary": "Paiement de type remboursement",
+                    "value": {
+                      "success": false,
+                      "message": "Refund payments cannot be deleted"
+                    }
+                  }
+                }
+              }
+            }
+          },
           "401": {
             "description": "Non authentifié"
           },
@@ -3382,7 +3854,7 @@
             "description": "Accès refusé"
           },
           "404": {
-            "description": "Paiement introuvable"
+            "description": "Paiement ou dossier introuvable"
           },
           "500": {
             "description": "Erreur serveur"

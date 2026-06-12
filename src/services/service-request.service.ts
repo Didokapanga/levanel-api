@@ -9,6 +9,7 @@ from '../utils/generate-request-reference';
 
 import { ApiError }
 from '../utils/api-error';
+import { db } from '../database/connection';
 
 const repository =
   new ServiceRequestRepository();
@@ -20,18 +21,45 @@ export class ServiceRequestService {
     actorId: string
   ) {
 
-    data.request_reference =
-      generateRequestReference();
+    const client =
+      await db.connect();
 
-    const request =
-      await repository.create(
-        data,
-        actorId
+    try {
+
+      await client.query(
+        'BEGIN'
       );
 
-    return sanitizeServiceRequest(
-      request
-    );
+      data.request_reference =
+        generateRequestReference();
+
+      const request =
+        await repository.create(
+          data,
+          actorId,
+          client
+        );
+
+      await client.query(
+        'COMMIT'
+      );
+
+      return sanitizeServiceRequest(
+        request
+      );
+
+    } catch (error) {
+
+      await client.query(
+        'ROLLBACK'
+      );
+
+      throw error;
+
+    } finally {
+
+      client.release();
+    }
   }
 
   async findAll(
@@ -61,70 +89,122 @@ export class ServiceRequestService {
     };
   }
 
+  async findById(
+  id: string
+) {
+
+  const request =
+    await repository.findRequestById(
+      id
+    );
+
+  if (!request) {
+
+    throw new ApiError(
+      'Request not found',
+      404
+    );
+  }
+
+  return sanitizeServiceRequest(
+    request
+  );
+}
+
   async update(
     id: string,
     data: any,
     actorId: string
   ) {
 
-    const existingRequest =
-      await repository.findById(id);
+    const client =
+      await db.connect();
 
-    if (!existingRequest) {
+    try {
 
-      throw new ApiError(
-        'Request not found',
-        404
+      await client.query(
+        'BEGIN'
       );
-    }
 
-    /*
-      Empêcher l'annulation
-      d'un dossier déjà soldé
-    */
+      const existingRequest =
+        await repository.findById(
+          id,
+          client
+        );
 
-    if (
-      data.status === 'cancelled'
-    ) {
-
-      if (
-        existingRequest.status
-        === 'completed'
-      ) {
+      if (!existingRequest) {
 
         throw new ApiError(
-
-          'Completed request cannot be cancelled',
-
-          400
+          'Request not found',
+          404
         );
       }
 
+      /*
+        Empêcher l'annulation
+        d'un dossier déjà soldé
+      */
+
       if (
-        Number(
-          existingRequest.remaining_amount
-        ) <= 0
+        data.status === 'cancelled'
       ) {
 
-        throw new ApiError(
+        if (
+          existingRequest.status
+          === 'completed'
+        ) {
 
-          'Paid request cannot be cancelled',
+          throw new ApiError(
 
-          400
-        );
+            'Completed request cannot be cancelled',
+
+            400
+          );
+        }
+
+        if (
+          Number(
+            existingRequest.remaining_amount
+          ) <= 0
+        ) {
+
+          throw new ApiError(
+
+            'Paid request cannot be cancelled',
+
+            400
+          );
+        }
       }
-    }
 
-    const request =
-      await repository.update(
-        id,
-        data,
-        actorId
+      const request =
+        await repository.update(
+          id,
+          data,
+          actorId,
+          client
+        );
+
+      await client.query(
+        'COMMIT'
       );
 
-    return sanitizeServiceRequest(
-      request
-    );
+      return sanitizeServiceRequest(
+        request
+      );
+
+    } catch (error) {
+
+      await client.query(
+        'ROLLBACK'
+      );
+
+      throw error;
+
+    } finally {
+
+      client.release();
+    }
   }
 
   async delete(
@@ -132,9 +212,50 @@ export class ServiceRequestService {
     actorId: string
   ) {
 
-    await repository.softDelete(
-      id,
-      actorId
-    );
+    const client =
+      await db.connect();
+
+    try {
+
+      await client.query(
+        'BEGIN'
+      );
+
+      const existingRequest =
+        await repository.findById(
+          id,
+          client
+        );
+
+      if (!existingRequest) {
+
+        throw new ApiError(
+          'Request not found',
+          404
+        );
+      }
+
+      await repository.softDelete(
+        id,
+        actorId,
+        client
+      );
+
+      await client.query(
+        'COMMIT'
+      );
+
+    } catch (error) {
+
+      await client.query(
+        'ROLLBACK'
+      );
+
+      throw error;
+
+    } finally {
+
+      client.release();
+    }
   }
 }
